@@ -12,6 +12,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -91,6 +92,7 @@ fun HeaderSection(
 @Composable
 fun ButtonSection(
     onStartPressed: () -> Unit = {},
+    onSigningPressed: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -108,10 +110,12 @@ fun ButtonSection(
                 style = MaterialTheme.typography.bodySmall
             )
         }
-        Text(
-            text = stringResource(id = R.string.start_with_signin),
-            style = MaterialTheme.typography.labelSmall
-        )
+        TextButton(onClick = onSigningPressed) {
+            Text(
+                text = stringResource(id = R.string.start_with_signin),
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
     }
 }
 
