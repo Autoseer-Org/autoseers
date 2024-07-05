@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">AutoSeers</string>
+    <string name="title_app_name" comment="Title shown in the initial screen">AutoSeers</string>
+    <string name="sub_title" comment="Subtitle shown in the initial screen">Discover personalized tips and trends to keep your car running longer and smoother.</string>
+    <string name="button_start" comment="Button text for transitioning to the next screen">Start</string>
+    <string name="start_with_signin" comment="Text that appears at the bottom screen to let user sign in with email">sign in with email</string>
 </resources>

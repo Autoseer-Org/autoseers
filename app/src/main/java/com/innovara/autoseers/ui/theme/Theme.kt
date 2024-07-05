@@ -1,22 +1,75 @@
 package com.example.compose
+
 import android.app.Activity
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
-import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.SideEffect
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import com.example.ui.theme.AppTypography
+import com.innovara.autoseers.ui.theme.backgroundDark
+import com.innovara.autoseers.ui.theme.backgroundLight
+import com.innovara.autoseers.ui.theme.errorContainerDark
+import com.innovara.autoseers.ui.theme.errorContainerLight
+import com.innovara.autoseers.ui.theme.errorDark
+import com.innovara.autoseers.ui.theme.errorLight
+import com.innovara.autoseers.ui.theme.inverseOnSurfaceDark
+import com.innovara.autoseers.ui.theme.inverseOnSurfaceLight
+import com.innovara.autoseers.ui.theme.inversePrimaryDark
+import com.innovara.autoseers.ui.theme.inversePrimaryLight
+import com.innovara.autoseers.ui.theme.inverseSurfaceDark
+import com.innovara.autoseers.ui.theme.inverseSurfaceLight
+import com.innovara.autoseers.ui.theme.onBackgroundDark
+import com.innovara.autoseers.ui.theme.onBackgroundLight
+import com.innovara.autoseers.ui.theme.onErrorContainerDark
+import com.innovara.autoseers.ui.theme.onErrorContainerLight
+import com.innovara.autoseers.ui.theme.onErrorDark
+import com.innovara.autoseers.ui.theme.onErrorLight
+import com.innovara.autoseers.ui.theme.onPrimaryContainerDark
+import com.innovara.autoseers.ui.theme.onPrimaryContainerLight
+import com.innovara.autoseers.ui.theme.onPrimaryDark
+import com.innovara.autoseers.ui.theme.onPrimaryLight
+import com.innovara.autoseers.ui.theme.onSecondaryContainerDark
+import com.innovara.autoseers.ui.theme.onSecondaryContainerLight
+import com.innovara.autoseers.ui.theme.onSecondaryDark
+import com.innovara.autoseers.ui.theme.onSecondaryLight
+import com.innovara.autoseers.ui.theme.onSurfaceDark
+import com.innovara.autoseers.ui.theme.onSurfaceLight
+import com.innovara.autoseers.ui.theme.onSurfaceVariantDark
+import com.innovara.autoseers.ui.theme.onSurfaceVariantLight
+import com.innovara.autoseers.ui.theme.onTertiaryContainerDark
+import com.innovara.autoseers.ui.theme.onTertiaryContainerLight
+import com.innovara.autoseers.ui.theme.onTertiaryDark
+import com.innovara.autoseers.ui.theme.onTertiaryLight
+import com.innovara.autoseers.ui.theme.outlineDark
+import com.innovara.autoseers.ui.theme.outlineLight
+import com.innovara.autoseers.ui.theme.outlineVariantDark
+import com.innovara.autoseers.ui.theme.outlineVariantLight
+import com.innovara.autoseers.ui.theme.primaryContainerDark
+import com.innovara.autoseers.ui.theme.primaryContainerLight
+import com.innovara.autoseers.ui.theme.primaryDark
+import com.innovara.autoseers.ui.theme.primaryLight
+import com.innovara.autoseers.ui.theme.scrimDark
+import com.innovara.autoseers.ui.theme.scrimLight
+import com.innovara.autoseers.ui.theme.secondaryContainerDark
+import com.innovara.autoseers.ui.theme.secondaryContainerLight
+import com.innovara.autoseers.ui.theme.secondaryDark
+import com.innovara.autoseers.ui.theme.secondaryLight
+import com.innovara.autoseers.ui.theme.surfaceDark
+import com.innovara.autoseers.ui.theme.surfaceLight
+import com.innovara.autoseers.ui.theme.surfaceVariantDark
+import com.innovara.autoseers.ui.theme.surfaceVariantLight
+import com.innovara.autoseers.ui.theme.tertiaryContainerDark
+import com.innovara.autoseers.ui.theme.tertiaryContainerLight
+import com.innovara.autoseers.ui.theme.tertiaryDark
+import com.innovara.autoseers.ui.theme.tertiaryLight
 
 private val lightScheme = lightColorScheme(
     primary = primaryLight,
@@ -80,158 +133,28 @@ private val darkScheme = darkColorScheme(
     inversePrimary = inversePrimaryDark,
 )
 
-private val mediumContrastLightColorScheme = lightColorScheme(
-    primary = primaryLightMediumContrast,
-    onPrimary = onPrimaryLightMediumContrast,
-    primaryContainer = primaryContainerLightMediumContrast,
-    onPrimaryContainer = onPrimaryContainerLightMediumContrast,
-    secondary = secondaryLightMediumContrast,
-    onSecondary = onSecondaryLightMediumContrast,
-    secondaryContainer = secondaryContainerLightMediumContrast,
-    onSecondaryContainer = onSecondaryContainerLightMediumContrast,
-    tertiary = tertiaryLightMediumContrast,
-    onTertiary = onTertiaryLightMediumContrast,
-    tertiaryContainer = tertiaryContainerLightMediumContrast,
-    onTertiaryContainer = onTertiaryContainerLightMediumContrast,
-    error = errorLightMediumContrast,
-    onError = onErrorLightMediumContrast,
-    errorContainer = errorContainerLightMediumContrast,
-    onErrorContainer = onErrorContainerLightMediumContrast,
-    background = backgroundLightMediumContrast,
-    onBackground = onBackgroundLightMediumContrast,
-    surface = surfaceLightMediumContrast,
-    onSurface = onSurfaceLightMediumContrast,
-    surfaceVariant = surfaceVariantLightMediumContrast,
-    onSurfaceVariant = onSurfaceVariantLightMediumContrast,
-    outline = outlineLightMediumContrast,
-    outlineVariant = outlineVariantLightMediumContrast,
-    scrim = scrimLightMediumContrast,
-    inverseSurface = inverseSurfaceLightMediumContrast,
-    inverseOnSurface = inverseOnSurfaceLightMediumContrast,
-    inversePrimary = inversePrimaryLightMediumContrast,
-)
-
-private val highContrastLightColorScheme = lightColorScheme(
-    primary = primaryLightHighContrast,
-    onPrimary = onPrimaryLightHighContrast,
-    primaryContainer = primaryContainerLightHighContrast,
-    onPrimaryContainer = onPrimaryContainerLightHighContrast,
-    secondary = secondaryLightHighContrast,
-    onSecondary = onSecondaryLightHighContrast,
-    secondaryContainer = secondaryContainerLightHighContrast,
-    onSecondaryContainer = onSecondaryContainerLightHighContrast,
-    tertiary = tertiaryLightHighContrast,
-    onTertiary = onTertiaryLightHighContrast,
-    tertiaryContainer = tertiaryContainerLightHighContrast,
-    onTertiaryContainer = onTertiaryContainerLightHighContrast,
-    error = errorLightHighContrast,
-    onError = onErrorLightHighContrast,
-    errorContainer = errorContainerLightHighContrast,
-    onErrorContainer = onErrorContainerLightHighContrast,
-    background = backgroundLightHighContrast,
-    onBackground = onBackgroundLightHighContrast,
-    surface = surfaceLightHighContrast,
-    onSurface = onSurfaceLightHighContrast,
-    surfaceVariant = surfaceVariantLightHighContrast,
-    onSurfaceVariant = onSurfaceVariantLightHighContrast,
-    outline = outlineLightHighContrast,
-    outlineVariant = outlineVariantLightHighContrast,
-    scrim = scrimLightHighContrast,
-    inverseSurface = inverseSurfaceLightHighContrast,
-    inverseOnSurface = inverseOnSurfaceLightHighContrast,
-    inversePrimary = inversePrimaryLightHighContrast,
-)
-
-private val mediumContrastDarkColorScheme = darkColorScheme(
-    primary = primaryDarkMediumContrast,
-    onPrimary = onPrimaryDarkMediumContrast,
-    primaryContainer = primaryContainerDarkMediumContrast,
-    onPrimaryContainer = onPrimaryContainerDarkMediumContrast,
-    secondary = secondaryDarkMediumContrast,
-    onSecondary = onSecondaryDarkMediumContrast,
-    secondaryContainer = secondaryContainerDarkMediumContrast,
-    onSecondaryContainer = onSecondaryContainerDarkMediumContrast,
-    tertiary = tertiaryDarkMediumContrast,
-    onTertiary = onTertiaryDarkMediumContrast,
-    tertiaryContainer = tertiaryContainerDarkMediumContrast,
-    onTertiaryContainer = onTertiaryContainerDarkMediumContrast,
-    error = errorDarkMediumContrast,
-    onError = onErrorDarkMediumContrast,
-    errorContainer = errorContainerDarkMediumContrast,
-    onErrorContainer = onErrorContainerDarkMediumContrast,
-    background = backgroundDarkMediumContrast,
-    onBackground = onBackgroundDarkMediumContrast,
-    surface = surfaceDarkMediumContrast,
-    onSurface = onSurfaceDarkMediumContrast,
-    surfaceVariant = surfaceVariantDarkMediumContrast,
-    onSurfaceVariant = onSurfaceVariantDarkMediumContrast,
-    outline = outlineDarkMediumContrast,
-    outlineVariant = outlineVariantDarkMediumContrast,
-    scrim = scrimDarkMediumContrast,
-    inverseSurface = inverseSurfaceDarkMediumContrast,
-    inverseOnSurface = inverseOnSurfaceDarkMediumContrast,
-    inversePrimary = inversePrimaryDarkMediumContrast,
-)
-
-private val highContrastDarkColorScheme = darkColorScheme(
-    primary = primaryDarkHighContrast,
-    onPrimary = onPrimaryDarkHighContrast,
-    primaryContainer = primaryContainerDarkHighContrast,
-    onPrimaryContainer = onPrimaryContainerDarkHighContrast,
-    secondary = secondaryDarkHighContrast,
-    onSecondary = onSecondaryDarkHighContrast,
-    secondaryContainer = secondaryContainerDarkHighContrast,
-    onSecondaryContainer = onSecondaryContainerDarkHighContrast,
-    tertiary = tertiaryDarkHighContrast,
-    onTertiary = onTertiaryDarkHighContrast,
-    tertiaryContainer = tertiaryContainerDarkHighContrast,
-    onTertiaryContainer = onTertiaryContainerDarkHighContrast,
-    error = errorDarkHighContrast,
-    onError = onErrorDarkHighContrast,
-    errorContainer = errorContainerDarkHighContrast,
-    onErrorContainer = onErrorContainerDarkHighContrast,
-    background = backgroundDarkHighContrast,
-    onBackground = onBackgroundDarkHighContrast,
-    surface = surfaceDarkHighContrast,
-    onSurface = onSurfaceDarkHighContrast,
-    surfaceVariant = surfaceVariantDarkHighContrast,
-    onSurfaceVariant = onSurfaceVariantDarkHighContrast,
-    outline = outlineDarkHighContrast,
-    outlineVariant = outlineVariantDarkHighContrast,
-    scrim = scrimDarkHighContrast,
-    inverseSurface = inverseSurfaceDarkHighContrast,
-    inverseOnSurface = inverseOnSurfaceDarkHighContrast,
-    inversePrimary = inversePrimaryDarkHighContrast,
-)
-
 @Composable
 fun AutoSeersTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
     content: @Composable() () -> Unit
 ) {
-  val colorScheme = when {
-      dynamicColor -> {
-          val context = LocalContext.current
-          if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-      }
-      
-      darkTheme -> darkScheme
-      else -> lightScheme
-  }
-  val view = LocalView.current
-  if (!view.isInEditMode) {
-    SideEffect {
-      val window = (view.context as Activity).window
-      window.statusBarColor = colorScheme.primary.toArgb()
-      WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+    val colorScheme = when {
+        darkTheme -> darkScheme
+        else -> lightScheme
     }
-  }
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            window.statusBarColor = colorScheme.primary.toArgb()
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+        }
+    }
 
-  MaterialTheme(
-    colorScheme = colorScheme,
-    typography = AppTypography,
-    content = content
-  )
+    MaterialTheme(
+        colorScheme = colorScheme,
+        typography = AppTypography,
+        content = content
+    )
 }
 
