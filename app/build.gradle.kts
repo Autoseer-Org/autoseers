@@ -71,8 +71,13 @@ dependencies {
     //Navigation
     implementation(libs.androidx.navigation.ui)
     implementation(libs.androidx.navigation.compose)
+    androidTestImplementation(libs.androidx.navigation.testing)
 
     //Serialization
     implementation(libs.kotlinx.serialization.json)
+
+    //Testing
+    androidTestImplementation(libs.ui.test.junit4)
+    debugImplementation(libs.ui.test.manifest)
 
 }

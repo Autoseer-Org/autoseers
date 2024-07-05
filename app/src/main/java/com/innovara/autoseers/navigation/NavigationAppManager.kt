@@ -2,6 +2,7 @@ package com.innovara.autoseers.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -26,9 +27,9 @@ import com.innovara.autoseers.navigation.routes.settings.SettingsRoute
 @Composable
 fun NavigationAppManager(
     modifier: Modifier = Modifier,
-    startDestination: OnboardingRoute = OnboardingRoute
+    startDestination: OnboardingRoute = OnboardingRoute,
+    navController: NavHostController = rememberNavController(),
 ) {
-    val navController = rememberNavController()
     NavHost(
         modifier = modifier,
         navController = navController,

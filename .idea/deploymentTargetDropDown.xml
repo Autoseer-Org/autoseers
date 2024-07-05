@@ -2,7 +2,16 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
+      <entry key="NavigationAppManagerTest">
+        <State />
+      </entry>
       <entry key="app">
+        <State />
+      </entry>
+      <entry key="when_app_starts_then_initial_screen_should_be_Login()">
+        <State />
+      </entry>
+      <entry key="when_user_is_authenticated_verified_user_is_in_home()">
         <State />
       </entry>
     </value>
