@@ -2,6 +2,10 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.serialization)
+
+    id("com.google.gms.google-services")
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -10,6 +14,7 @@ android {
     sourceSets {
 
     }
+
     defaultConfig {
         applicationId = "com.innovara.autoseers"
         minSdk = 32
@@ -82,4 +87,13 @@ dependencies {
     androidTestImplementation(libs.ui.test.junit4)
     debugImplementation(libs.ui.test.manifest)
 
+    implementation(platform(libs.firebase.bom))
+
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
+}
+
+// Allow references to generated code
+kapt {
+    correctErrorTypes = true
 }
