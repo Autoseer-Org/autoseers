@@ -11,9 +11,6 @@ plugins {
 android {
     namespace = "com.innovara.autoseers"
     compileSdk = 34
-    sourceSets {
-
-    }
 
     defaultConfig {
         applicationId = "com.innovara.autoseers"
