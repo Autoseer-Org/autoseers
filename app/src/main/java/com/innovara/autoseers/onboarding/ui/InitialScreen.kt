@@ -1,4 +1,4 @@
-package com.innovara.autoseers.onboarding.initialscreen.ui
+package com.innovara.autoseers.onboarding.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

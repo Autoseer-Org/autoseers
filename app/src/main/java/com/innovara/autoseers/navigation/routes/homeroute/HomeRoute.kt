@@ -1,5 +1,6 @@
 package com.innovara.autoseers.navigation.routes.homeroute
 
+import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.innovara.autoseers.home.ui.HomeScreen

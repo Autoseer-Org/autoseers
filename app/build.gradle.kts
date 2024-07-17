@@ -84,8 +84,12 @@ dependencies {
     androidTestImplementation(libs.ui.test.junit4)
     debugImplementation(libs.ui.test.manifest)
 
+    //Firebase
     implementation(platform(libs.firebase.bom))
+    implementation("com.google.firebase:firebase-auth")
 
+
+    //Hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
 }

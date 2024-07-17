@@ -14,6 +14,8 @@ import com.innovara.autoseers.navigation.routes.homeroute.buildHomeScreen
 import com.innovara.autoseers.navigation.routes.maps.MapsRoute
 import com.innovara.autoseers.navigation.routes.onboardingroute.OnboardingRoute
 import com.innovara.autoseers.navigation.routes.onboardingroute.buildOnboardingScreen
+import com.innovara.autoseers.navigation.routes.onboardingroute.buildPhoneAuthenticationScreen
+import com.innovara.autoseers.navigation.routes.onboardingroute.navigateToPhoneAuthentication
 import com.innovara.autoseers.navigation.routes.settings.SettingsRoute
 
 
@@ -27,15 +29,19 @@ import com.innovara.autoseers.navigation.routes.settings.SettingsRoute
  */
 @Composable
 fun NavigationAppManager(
-    modifier: Modifier = Modifier,
     startDestination: OnboardingRoute = OnboardingRoute,
     navController: NavHostController = rememberNavController(),
+    onPhoneNumberEntered: (String) -> Unit,
 ) {
     NavHost(
         navController = navController,
         startDestination = startDestination
     ) {
-        buildOnboardingScreen()
+        buildOnboardingScreen(navigateToPhoneAuthentication = {
+            navController.navigateToPhoneAuthentication()
+        })
+        buildPhoneAuthenticationScreen(onPhoneNumberEntered = onPhoneNumberEntered)
+
         navigation<AutoSeersExperience>(startDestination = HomeRoute) {
             buildHomeScreen()
             composable<MapsRoute> { }
