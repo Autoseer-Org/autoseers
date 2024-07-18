@@ -18,9 +18,6 @@
           <timeTargetWasSelectedWithDropDown value="2024-07-16T23:19:10.625334Z" />
         </State>
       </entry>
-      <entry key="NavigationAppManagerTest">
-        <State />
-      </entry>
       <entry key="app">
         <State>
           <targetSelectedWithDropDown>
@@ -36,9 +33,6 @@
           </targetSelectedWithDropDown>
           <timeTargetWasSelectedWithDropDown value="2024-07-05T04:13:18.916997Z" />
         </State>
-      </entry>
-      <entry key="when_app_starts_then_initial_screen_should_be_Login()">
-        <State />
       </entry>
       <entry key="when_user_is_authenticated_verified_user_is_in_home()">
         <State />

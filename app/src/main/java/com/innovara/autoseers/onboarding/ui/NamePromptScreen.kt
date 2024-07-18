@@ -14,22 +14,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 
 @Composable
-fun PhoneAuthenticationScreen(
-    modifier: Modifier = Modifier,
-    onPhoneNumberEntered: (String) -> Unit,
+fun NamePromptScreen(
+    onNameEntered: (String) -> Unit = {}
 ) {
-    var phoneNumber by remember {
-        mutableStateOf("")
-    }
-    Scaffold(modifier) {
+    Scaffold {
+        var username by remember {
+            mutableStateOf("")
+        }
         Column(modifier = Modifier.padding(it)) {
-            Text(text = "Enter phone number")
-            TextField(value = phoneNumber, onValueChange = {
-                phoneNumber = it
+            Text(text = "Enter your name")
+            TextField(value = username, onValueChange = {
+                username = it
             })
 
             Button(onClick = {
-                onPhoneNumberEntered(phoneNumber)
+                onNameEntered(username)
             }) {
                 Text(text = "Continue")
             }

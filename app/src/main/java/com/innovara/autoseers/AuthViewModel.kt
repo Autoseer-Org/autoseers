@@ -9,13 +9,42 @@ import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+
+data class AuthInProgressModel(
+    val shouldTransitionToCodeScreen: Boolean,
+    val verificationId: String = "",
+)
+
+data class AuthAuthenticatedModel(
+    val tokenId: String = "",
+    val userName: String = "",
+)
+
+sealed class AuthState {
+    data object NotAuthenticated : AuthState()
+    data object Error : AuthState()
+    data class InProgress(
+        val authInProgressModel: AuthInProgressModel,
+    ) : AuthState()
+
+    data class UserAuthenticated(
+        val authAuthenticatedModel: AuthAuthenticatedModel,
+    ) : AuthState()
+}
 
 @HiltViewModel
 class AuthViewModel @Inject constructor() : ViewModel() {
 
     private var currentVerificationStatus: VerificationStatus = VerificationStatus.UNKNOWN
+
+    private val _authState: MutableStateFlow<AuthState> =
+        MutableStateFlow(AuthState.NotAuthenticated)
+    val authState: StateFlow<AuthState> = _authState
 
 
     /*
@@ -31,11 +60,22 @@ class AuthViewModel @Inject constructor() : ViewModel() {
             .addOnCompleteListener(activity) { task ->
                 when {
                     task.isSuccessful -> {
-                        // User has been signed in. Take user to home}
+                        // User has been signed in. Take user to home
+                        val user = task.result.user
+                        user?.getIdToken(true)?.addOnCompleteListener { tokenTask ->
+                            _authState.update {
+                                AuthState.UserAuthenticated(
+                                    authAuthenticatedModel = AuthAuthenticatedModel(tokenId = tokenTask.result.token ?: "")
+                                )
+                            }
+                        }
                     }
 
                     task.isCanceled || task.exception != null -> {
                         // User encountered error
+                        _authState.update {
+                            AuthState.Error
+                        }
                     }
                 }
             }
@@ -80,11 +120,23 @@ class AuthViewModel @Inject constructor() : ViewModel() {
 
             override fun onVerificationFailed(exception: FirebaseException) {
                 Log.d("Verification process", "Verification failed")
+                _authState.update { AuthState.Error }
             }
 
-            override fun onCodeSent(verificationId: String, token: PhoneAuthProvider.ForceResendingToken) {
+            override fun onCodeSent(
+                verificationId: String,
+                token: PhoneAuthProvider.ForceResendingToken
+            ) {
                 Log.d("Verification process", "Verification code sent")
                 super.onCodeSent(verificationId, token)
+                _authState.update {
+                    AuthState.InProgress(
+                        authInProgressModel = AuthInProgressModel(
+                            shouldTransitionToCodeScreen = true,
+                            verificationId = verificationId
+                        )
+                    )
+                }
             }
         }
     }
@@ -96,6 +148,33 @@ class AuthViewModel @Inject constructor() : ViewModel() {
      */
     fun storeCurrentVerificationStep(outState: Bundle) {
         outState.putString(CURRENT_VERIFICATION_KEY, currentVerificationStatus.name)
+    }
+
+    fun manualCodeEntered(code: String, auth: FirebaseAuth, activity: MainActivity) {
+        val currentState = authState.value
+        if (currentState is AuthState.InProgress) {
+            val credentials = PhoneAuthProvider.getCredential(
+                currentState.authInProgressModel.verificationId,
+                code
+            )
+
+            signInWithPhoneAuthCredential(auth, credentials, activity)
+        }
+    }
+
+    fun nameEntered(name: String) {
+        when (authState.value) {
+            is AuthState.UserAuthenticated -> {
+                _authState.update {
+                    (it as AuthState.UserAuthenticated).copy(
+                        authAuthenticatedModel = it.authAuthenticatedModel.copy(userName = name)
+                    )
+                }
+                //TODO(adrian): Send request to BE to create user record in firestore
+            }
+
+            else -> Unit
+        }
     }
 
     companion object {

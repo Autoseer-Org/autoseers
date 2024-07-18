@@ -1,20 +1,18 @@
 package com.innovara.autoseers
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.example.compose.AutoSeersTheme
 import com.innovara.autoseers.di.firebase.FirebaseAuthService
 import com.innovara.autoseers.navigation.NavigationAppManager
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -47,14 +45,34 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize()
                 ) {
+                    val authState by authViewModel.authState.collectAsState()
+                    val shouldNavigateToCodeScreen = when (val localAuthState = authState) {
+                        is AuthState.InProgress -> localAuthState.authInProgressModel.shouldTransitionToCodeScreen
+                        else -> false
+                    }
+
+                    val shouldNavigateToNamePrompt = when (authState) {
+                        is AuthState.UserAuthenticated -> true
+                        else -> false
+                    }
                     NavigationAppManager(
                         onPhoneNumberEntered = { phoneNumber ->
                             authViewModel.createPhoneAuthOptions(
-                                firebaseAuthService.auth(),
-                                phoneNumber,
-                                this
+                                auth = firebaseAuthService.auth(),
+                                phoneNumber = phoneNumber,
+                                activity = this
                             )
-                        }
+                        },
+                        onCodeEntered = {
+                            authViewModel.manualCodeEntered(
+                                code = it,
+                                auth = firebaseAuthService.auth(),
+                                activity = this
+                            )
+                        },
+                        onNameEntered = authViewModel::nameEntered,
+                        shouldNavigateToCodeScreen = shouldNavigateToCodeScreen,
+                        shouldNavigateToNamePrompt = shouldNavigateToNamePrompt
                     )
                 }
             }
