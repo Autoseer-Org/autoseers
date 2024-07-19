@@ -1,8 +1,6 @@
 package com.innovara.autoseers.navigation
 
 import android.annotation.SuppressLint
-import android.util.Log
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -11,15 +9,15 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
-import androidx.navigation.toRoute
+import com.innovara.autoseers.AuthState
 import com.innovara.autoseers.navigation.routes.AutoSeersExperience
 import com.innovara.autoseers.navigation.routes.homeroute.HomeRoute
 import com.innovara.autoseers.navigation.routes.homeroute.buildHomeScreen
@@ -51,14 +49,28 @@ fun NavigationAppManager(
     onPhoneNumberEntered: (String) -> Unit,
     onCodeEntered: (String) -> Unit,
     onNameEntered: (String) -> Unit,
-    shouldNavigateToCodeScreen: Boolean = false,
-    shouldNavigateToNamePrompt: Boolean = false,
+    authState: AuthState,
+    resetAuthState: () -> Unit = {},
 ) {
 
     val currentScreen by navController.currentBackStackEntryAsState()
-    val shouldShowBottomNavBar = currentScreen
-        ?.getRouteLastSegmentName()
-        ?.isAllowedToSeeBottomNavBar(listOf("HomeRoute", "SettingsRoute", "MapsRoute")) == true
+    val shouldShowBottomNavBar = remember {
+        currentScreen
+            ?.getRouteLastSegmentName()
+            ?.isAllowedToSeeBottomNavBar(listOf("HomeRoute", "SettingsRoute", "MapsRoute")) == true
+    }
+
+    val shouldNavigateToCodeScreen =
+        when (authState) {
+            is AuthState.InProgress -> authState.authInProgressModel.shouldTransitionToCodeScreen
+            else -> false
+        }
+
+    val shouldNavigateToNamePrompt =
+        when (authState) {
+            is AuthState.UserAuthenticated -> true
+            else -> false
+        }
 
     Scaffold(
         bottomBar = {
@@ -89,7 +101,12 @@ fun NavigationAppManager(
                 navController.navigateToPhoneAuthentication()
             })
             buildPhoneAuthenticationScreen(
+                authState = authState,
                 onPhoneNumberEntered = onPhoneNumberEntered,
+                onBackPressed = {
+                    navController.popBackStack()
+                    resetAuthState()
+                }
             )
             buildCodeAuthScreen(
                 onCodeEntered = onCodeEntered,

@@ -4,11 +4,15 @@ import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.google.firebase.FirebaseException
+import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthException
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -27,7 +31,9 @@ data class AuthAuthenticatedModel(
 
 sealed class AuthState {
     data object NotAuthenticated : AuthState()
-    data object Error : AuthState()
+    data class Error(
+        val message: String,
+    ) : AuthState()
     data class InProgress(
         val authInProgressModel: AuthInProgressModel,
     ) : AuthState()
@@ -74,7 +80,7 @@ class AuthViewModel @Inject constructor() : ViewModel() {
                     task.isCanceled || task.exception != null -> {
                         // User encountered error
                         _authState.update {
-                            AuthState.Error
+                            AuthState.Error("")
                         }
                     }
                 }
@@ -120,7 +126,15 @@ class AuthViewModel @Inject constructor() : ViewModel() {
 
             override fun onVerificationFailed(exception: FirebaseException) {
                 Log.d("Verification process", "Verification failed")
-                _authState.update { AuthState.Error }
+                when(exception) {
+                    is FirebaseAuthInvalidCredentialsException -> {
+                        _authState.update { AuthState.Error("Invalid request") }
+                    }
+                    is FirebaseTooManyRequestsException -> {
+                        _authState.update { AuthState.Error("You have tried too times. Try again in 5 minutes.") }
+                    }
+                    else -> _authState.update { AuthState.Error(exception.message ?: "") }
+                }
             }
 
             override fun onCodeSent(
@@ -176,6 +190,8 @@ class AuthViewModel @Inject constructor() : ViewModel() {
             else -> Unit
         }
     }
+
+    fun resetAuthState() = _authState.update { AuthState.NotAuthenticated }
 
     companion object {
         private const val CURRENT_VERIFICATION_KEY = "CURRENT_VERIFICATION_KEY"

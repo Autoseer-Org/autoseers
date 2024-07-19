@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.example.compose.AutoSeersTheme
 import com.innovara.autoseers.di.firebase.FirebaseAuthService
@@ -46,16 +47,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize()
                 ) {
                     val authState by authViewModel.authState.collectAsState()
-                    val shouldNavigateToCodeScreen = when (val localAuthState = authState) {
-                        is AuthState.InProgress -> localAuthState.authInProgressModel.shouldTransitionToCodeScreen
-                        else -> false
-                    }
-
-                    val shouldNavigateToNamePrompt = when (authState) {
-                        is AuthState.UserAuthenticated -> true
-                        else -> false
-                    }
                     NavigationAppManager(
+                        authState = authState,
                         onPhoneNumberEntered = { phoneNumber ->
                             authViewModel.createPhoneAuthOptions(
                                 auth = firebaseAuthService.auth(),
@@ -71,8 +64,7 @@ class MainActivity : ComponentActivity() {
                             )
                         },
                         onNameEntered = authViewModel::nameEntered,
-                        shouldNavigateToCodeScreen = shouldNavigateToCodeScreen,
-                        shouldNavigateToNamePrompt = shouldNavigateToNamePrompt
+                        resetAuthState = authViewModel::resetAuthState
                     )
                 }
             }
