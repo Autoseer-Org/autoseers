@@ -1,5 +1,7 @@
 package com.innovara.autoseers.navigation
 
+import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -10,6 +12,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -40,6 +43,7 @@ import com.innovara.autoseers.navigation.routes.settings.SettingsRoute
  * A routes describes how to get to a destination. A route can have a payload attached to it
  * TODO(adrian):  once the bottom navigation is implemented we should account for tab navigation
  */
+@SuppressLint("RestrictedApi")
 @Composable
 fun NavigationAppManager(
     startDestination: OnboardingRoute = OnboardingRoute,
@@ -50,16 +54,23 @@ fun NavigationAppManager(
     shouldNavigateToCodeScreen: Boolean = false,
     shouldNavigateToNamePrompt: Boolean = false,
 ) {
+
     val currentScreen by navController.currentBackStackEntryAsState()
+    val shouldShowBottomNavBar = currentScreen
+        ?.getRouteLastSegmentName()
+        ?.isAllowedToSeeBottomNavBar(listOf("HomeRoute", "SettingsRoute", "MapsRoute")) == true
+
     Scaffold(
         bottomBar = {
-            BottomNavBar(
-                navController = navController, items = listOf(
-                    BottomNavItem(HomeRoute.toString(), Icons.Default.Home, "home"),
-                    BottomNavItem(MapsRoute.toString(), Icons.Default.Place, "maps"),
-                    BottomNavItem(SettingsRoute.toString(), Icons.Default.Settings, "settings"),
+            if (shouldShowBottomNavBar) {
+                BottomNavBar(
+                    navController = navController, items = listOf(
+                        BottomNavItem(HomeRoute.toString(), Icons.Default.Home, "home"),
+                        BottomNavItem(MapsRoute.toString(), Icons.Default.Place, "maps"),
+                        BottomNavItem(SettingsRoute.toString(), Icons.Default.Settings, "settings"),
+                    )
                 )
-            )
+            }
         }
     ) {
         if (shouldNavigateToCodeScreen) {
