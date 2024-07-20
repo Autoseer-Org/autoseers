@@ -5,28 +5,36 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.testing.TestNavHostController
+import androidx.test.platform.app.InstrumentationRegistry
+import com.innovara.autoseers.AuthState
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import com.innovara.autoseers.R
 
 class NavigationAppManagerTest {
     @get:Rule
     val composeTestRule = createComposeRule()
     lateinit var navController: TestNavHostController
 
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
+
     @Before
     fun setup() {
         composeTestRule.setContent {
             navController = TestNavHostController(LocalContext.current)
             navController.navigatorProvider.addNavigator(ComposeNavigator())
-            NavigationAppManager(navController = navController)
+            NavigationAppManager(
+                navController = navController,
+                authState = AuthState.NotAuthenticated
+            )
         }
     }
 
     @Test
     fun when_app_starts_then_initial_screen_should_be_Login() {
         composeTestRule
-            .onNodeWithText("Hello from onboarding")
+            .onNodeWithText(context.getString(R.string.title_app_name))
             .assertExists()
     }
 }

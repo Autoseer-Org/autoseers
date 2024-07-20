@@ -9,9 +9,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.compose.AutoSeersTheme
 import com.innovara.autoseers.di.firebase.FirebaseService
 import com.innovara.autoseers.navigation.NavigationAppManager
+import com.innovara.autoseers.onboarding.logic.OnboardingViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -46,6 +48,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize()
                 ) {
                     val authState by authViewModel.authState.collectAsState()
+                    val onboardingViewModel = hiltViewModel<OnboardingViewModel>()
                     NavigationAppManager(
                         authState = authState,
                         onPhoneNumberEntered = { phoneNumber ->
@@ -63,7 +66,8 @@ class MainActivity : ComponentActivity() {
                             )
                         },
                         onNameEntered = authViewModel::nameEntered,
-                        resetAuthState = authViewModel::resetAuthState
+                        resetAuthState = authViewModel::resetAuthState,
+                        handleAnalyticsEvents = onboardingViewModel.handleAnalyticsEvents()
                     )
                 }
             }

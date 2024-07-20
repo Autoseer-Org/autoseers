@@ -2,21 +2,8 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="MainActivity">
-        <State>
-          <runningDeviceTargetSelectedWithDropDown>
-            <Target>
-              <type value="RUNNING_DEVICE_TARGET" />
-              <deviceKey>
-                <Key>
-                  <type value="VIRTUAL_DEVICE_PATH" />
-                  <value value="$USER_HOME$/.android/avd/Pixel_3a_API_34_extension_level_7_arm64-v8a.avd" />
-                </Key>
-              </deviceKey>
-            </Target>
-          </runningDeviceTargetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-07-16T23:19:10.625334Z" />
-        </State>
+      <entry key="NavigationAppManagerTest">
+        <State />
       </entry>
       <entry key="app">
         <State>
@@ -34,7 +21,7 @@
           <timeTargetWasSelectedWithDropDown value="2024-07-05T04:13:18.916997Z" />
         </State>
       </entry>
-      <entry key="when_user_is_authenticated_verified_user_is_in_home()">
+      <entry key="when_app_starts_then_initial_screen_should_be_Login()">
         <State />
       </entry>
     </value>

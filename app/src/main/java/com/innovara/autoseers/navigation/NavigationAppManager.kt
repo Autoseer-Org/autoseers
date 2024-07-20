@@ -1,6 +1,5 @@
 package com.innovara.autoseers.navigation
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -11,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -32,7 +30,7 @@ import com.innovara.autoseers.navigation.routes.onboardingroute.navigateToCodeSc
 import com.innovara.autoseers.navigation.routes.onboardingroute.navigateToNamePrompt
 import com.innovara.autoseers.navigation.routes.onboardingroute.navigateToPhoneAuthentication
 import com.innovara.autoseers.navigation.routes.settings.SettingsRoute
-import com.innovara.autoseers.onboarding.logic.OnboardingViewModel
+import com.innovara.autoseers.onboarding.logic.OnboardingEvents
 
 
 /**
@@ -47,13 +45,13 @@ import com.innovara.autoseers.onboarding.logic.OnboardingViewModel
 fun NavigationAppManager(
     startDestination: OnboardingRoute = OnboardingRoute,
     navController: NavHostController = rememberNavController(),
-    onPhoneNumberEntered: (String) -> Unit,
-    onCodeEntered: (String) -> Unit,
-    onNameEntered: (String) -> Unit,
+    onPhoneNumberEntered: (String) -> Unit = {},
+    onCodeEntered: (String) -> Unit = {},
+    onNameEntered: (String) -> Unit = {},
     authState: AuthState,
     resetAuthState: () -> Unit = {},
+    handleAnalyticsEvents: (OnboardingEvents) -> Unit = {}
 ) {
-    val onboardingViewModel = hiltViewModel<OnboardingViewModel>()
     val currentScreen by navController.currentBackStackEntryAsState()
     val shouldShowBottomNavBar = remember {
         currentScreen
@@ -108,7 +106,7 @@ fun NavigationAppManager(
                     navController.popBackStack()
                     resetAuthState()
                 },
-                onPhoneAuthEvents = onboardingViewModel.handleAnalyticsEvents(),
+                onPhoneAuthEvents = handleAnalyticsEvents,
             )
             buildCodeAuthScreen(
                 onCodeEntered = onCodeEntered,
@@ -116,7 +114,7 @@ fun NavigationAppManager(
                     navController.popBackStack()
                     resetAuthState()
                 },
-                onCodeAuthEvents = onboardingViewModel.handleAnalyticsEvents(),
+                onCodeAuthEvents = handleAnalyticsEvents,
             )
 
             buildNamePromptScreen(
