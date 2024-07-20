@@ -5,6 +5,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.innovara.autoseers.AuthState
 import com.innovara.autoseers.navigation.routes.homeroute.HomeRoute
+import com.innovara.autoseers.onboarding.logic.OnboardingEvents
+import com.innovara.autoseers.onboarding.logic.OnboardingViewModel
 import com.innovara.autoseers.onboarding.ui.CodeAuthenticationScreen
 import com.innovara.autoseers.onboarding.ui.InitialScreen
 import com.innovara.autoseers.onboarding.ui.NamePromptScreen
@@ -36,13 +38,15 @@ fun NavGraphBuilder.buildOnboardingScreen(
 fun NavGraphBuilder.buildPhoneAuthenticationScreen(
     onPhoneNumberEntered: (String) -> Unit,
     onBackPressed: () -> Unit,
+    onPhoneAuthEvents: (OnboardingEvents) -> Unit,
     authState: AuthState,
 ) {
     composable<PhoneAuthenticationRoute> {
         PhoneAuthenticationScreen(
             authState = authState,
             onPhoneNumberEntered = onPhoneNumberEntered,
-            onBackPressed = onBackPressed
+            onBackPressed = onBackPressed,
+            onPhoneAuthEvents = onPhoneAuthEvents
         )
     }
 }

@@ -8,10 +8,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.example.compose.AutoSeersTheme
-import com.innovara.autoseers.di.firebase.FirebaseAuthService
+import com.innovara.autoseers.di.firebase.FirebaseService
 import com.innovara.autoseers.navigation.NavigationAppManager
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -20,13 +19,13 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
 
     @Inject
-    lateinit var firebaseAuthService: FirebaseAuthService
+    lateinit var firebaseService: FirebaseService
 
     private val authViewModel: AuthViewModel by viewModels()
 
     override fun onStart() {
         super.onStart()
-        val auth = firebaseAuthService.auth()
+        val auth = firebaseService.auth()
         when (auth.currentUser) {
             null -> {
                 // User is not sign in. Take them to the onboarding page
@@ -51,7 +50,7 @@ class MainActivity : ComponentActivity() {
                         authState = authState,
                         onPhoneNumberEntered = { phoneNumber ->
                             authViewModel.createPhoneAuthOptions(
-                                auth = firebaseAuthService.auth(),
+                                auth = firebaseService.auth(),
                                 phoneNumber = phoneNumber,
                                 activity = this
                             )
@@ -59,7 +58,7 @@ class MainActivity : ComponentActivity() {
                         onCodeEntered = {
                             authViewModel.manualCodeEntered(
                                 code = it,
-                                auth = firebaseAuthService.auth(),
+                                auth = firebaseService.auth(),
                                 activity = this
                             )
                         },

@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -31,6 +32,7 @@ import com.innovara.autoseers.navigation.routes.onboardingroute.navigateToCodeSc
 import com.innovara.autoseers.navigation.routes.onboardingroute.navigateToNamePrompt
 import com.innovara.autoseers.navigation.routes.onboardingroute.navigateToPhoneAuthentication
 import com.innovara.autoseers.navigation.routes.settings.SettingsRoute
+import com.innovara.autoseers.onboarding.logic.OnboardingViewModel
 
 
 /**
@@ -41,7 +43,6 @@ import com.innovara.autoseers.navigation.routes.settings.SettingsRoute
  * A routes describes how to get to a destination. A route can have a payload attached to it
  * TODO(adrian):  once the bottom navigation is implemented we should account for tab navigation
  */
-@SuppressLint("RestrictedApi")
 @Composable
 fun NavigationAppManager(
     startDestination: OnboardingRoute = OnboardingRoute,
@@ -52,7 +53,7 @@ fun NavigationAppManager(
     authState: AuthState,
     resetAuthState: () -> Unit = {},
 ) {
-
+    val onboardingViewModel = hiltViewModel<OnboardingViewModel>()
     val currentScreen by navController.currentBackStackEntryAsState()
     val shouldShowBottomNavBar = remember {
         currentScreen
@@ -106,7 +107,8 @@ fun NavigationAppManager(
                 onBackPressed = {
                     navController.popBackStack()
                     resetAuthState()
-                }
+                },
+                onPhoneAuthEvents = onboardingViewModel.handleAnalyticsEvents(),
             )
             buildCodeAuthScreen(
                 onCodeEntered = onCodeEntered,

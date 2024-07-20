@@ -89,10 +89,13 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation("com.google.firebase:firebase-auth")
 
-
     //Hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
+
+    //Firebase Analytics
+    implementation("com.google.firebase:firebase-analytics")
 }
 
 // Allow references to generated code

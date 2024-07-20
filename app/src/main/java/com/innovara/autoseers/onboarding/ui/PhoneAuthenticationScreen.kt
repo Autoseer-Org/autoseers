@@ -36,6 +36,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.innovara.autoseers.AuthState
 import com.innovara.autoseers.R
+import com.innovara.autoseers.onboarding.logic.OnboardingEvents
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,6 +45,7 @@ fun PhoneAuthenticationScreen(
     modifier: Modifier = Modifier,
     onPhoneNumberEntered: (String) -> Unit,
     onBackPressed: () -> Unit,
+    onPhoneAuthEvents: (OnboardingEvents) -> Unit,
     authState: AuthState,
 ) {
     var phoneNumber by remember {
@@ -126,6 +128,7 @@ fun PhoneAuthenticationScreen(
                 onClick = {
                     onPhoneNumberEntered("+1$phoneNumber")
                     focusManager.clearFocus(true)
+                    onPhoneAuthEvents.invoke(OnboardingEvents.PhoneNumberEntered)
                 }) {
                 Text(text = "Continue")
             }
