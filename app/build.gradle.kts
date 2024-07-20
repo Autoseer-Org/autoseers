@@ -96,6 +96,11 @@ dependencies {
 
     //Firebase Analytics
     implementation("com.google.firebase:firebase-analytics")
+
+    //Network
+    implementation(libs.retrofit)
+    implementation(libs.converter.kotlinx.serialization)
+    implementation(libs.okhttp)
 }
 
 // Allow references to generated code

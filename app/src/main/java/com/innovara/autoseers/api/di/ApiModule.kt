@@ -1,0 +1,19 @@
+package com.innovara.autoseers.api.di
+
+import com.innovara.autoseers.api.onboarding.OnboardingService
+import com.innovara.autoseers.api.onboarding.OnboardingServiceImpl
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ViewModelComponent
+import retrofit2.Retrofit
+
+@Module
+@InstallIn(ViewModelComponent::class)
+object ApiModule {
+    @Provides
+    fun provideOnboardingService(
+        retrofit: Retrofit
+    ): OnboardingService =
+        OnboardingServiceImpl(retrofit)
+}
