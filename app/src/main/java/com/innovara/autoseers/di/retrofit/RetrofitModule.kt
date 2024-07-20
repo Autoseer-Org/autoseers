@@ -13,7 +13,7 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 @Module
 @InstallIn(ViewModelComponent::class)
 object RetrofitModule {
-    const val BASE_URL = "https://autoseers-woegjoq56q-ue.a.run.app/"
+    private const val BASE_URL = "https://autoseers-woegjoq56q-ue.a.run.app/"
 
     @Provides
     fun provideRetrofit(): Retrofit {
