@@ -7,4 +7,9 @@
 
     <string name="sign_up_long_message">Let’s create an account! We’ll send out a confirmation code to confirm your account to the phone number you entered.</string>
     <string name="support_text_message">We currently only support US valid phone numbers.</string>
+
+    <string name="code_sent_title">Phone verification</string>
+    <string name="code_sent_message">We\'ve sent a code to the phone number you provided us. Enter the verification code to confirm your identity!</string>
+
+    <string name="next_button">Next</string>
 </resources>

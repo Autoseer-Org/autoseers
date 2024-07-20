@@ -112,6 +112,11 @@ fun NavigationAppManager(
             )
             buildCodeAuthScreen(
                 onCodeEntered = onCodeEntered,
+                onBackPressed = {
+                    navController.popBackStack()
+                    resetAuthState()
+                },
+                onCodeAuthEvents = onboardingViewModel.handleAnalyticsEvents(),
             )
 
             buildNamePromptScreen(

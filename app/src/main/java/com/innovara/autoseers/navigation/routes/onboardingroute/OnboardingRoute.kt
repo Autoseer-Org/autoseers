@@ -53,9 +53,15 @@ fun NavGraphBuilder.buildPhoneAuthenticationScreen(
 
 fun NavGraphBuilder.buildCodeAuthScreen(
     onCodeEntered: (String) -> Unit,
+    onBackPressed: () -> Unit,
+    onCodeAuthEvents: (OnboardingEvents) -> Unit,
 ) {
     composable<CodeRoute> {
-        CodeAuthenticationScreen(onCodeEntered = onCodeEntered)
+        CodeAuthenticationScreen(
+            onCodeEntered = onCodeEntered,
+            onBackPressed = onBackPressed,
+            onCodeAuthEvents = onCodeAuthEvents,
+        )
     }
 }
 
