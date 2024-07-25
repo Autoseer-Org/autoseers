@@ -14,7 +14,7 @@ android {
 
     defaultConfig {
         applicationId = "com.innovara.autoseers"
-        minSdk = 32
+        minSdk = 31
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -103,6 +103,9 @@ dependencies {
     implementation(libs.converter.kotlinx.serialization)
     implementation(libs.logging.interceptor)
     implementation(libs.okhttp)
+
+    //Activity
+    implementation(libs.androidx.activity.ktx)
 }
 
 // Allow references to generated code

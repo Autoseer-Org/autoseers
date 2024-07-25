@@ -7,7 +7,7 @@ import androidx.navigation.NavBackStackEntry
  * This function gets the last segment of the path project which is the route name we need
  */
 internal fun NavBackStackEntry.getRouteLastSegmentName(): String {
-    return destination.route?.split(":")?.last() ?: ""
+    return destination.route?.split(".")?.last() ?: ""
 }
 
 /*

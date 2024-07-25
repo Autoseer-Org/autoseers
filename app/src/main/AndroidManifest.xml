@@ -13,6 +13,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AutoSeers"
         >
+        <provider
+            android:authorities="com.innovara.autoseers.fileprovider"
+            android:name="com.innovara.autoseers.home.HomeFileProvider"
+            android:grantUriPermissions="true" >
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_provider_path"
+                />
+        </provider>
         <activity
             android:name=".MainActivity"
             android:exported="true"

@@ -1,4 +1,5 @@
 [versions]
+activityKtx = "1.9.1"
 agp = "8.3.0"
 converterKotlinxSerialization = "2.10.0"
 firebaseBom = "33.1.2"
@@ -25,6 +26,7 @@ googleServices = "4.4.2"
 
 
 [libraries]
+androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-material = { module = "androidx.compose.material:material", version.ref = "material" }

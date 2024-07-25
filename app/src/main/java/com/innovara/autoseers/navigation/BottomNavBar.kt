@@ -8,7 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavController
-import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.innovara.autoseers.navigation.routes.GlobalRoute
 
@@ -23,16 +22,11 @@ fun BottomNavBar(navController: NavController, items: List<BottomNavItem>) {
     NavigationBar(
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentDestination = navBackStackEntry?.destination
-
         items.forEach { item ->
             NavigationBarItem(
                 icon = { Icon(item.icon, contentDescription = item.label) },
                 label = { Text(item.label) },
-                selected = currentDestination?.hierarchy?.any {
-                    val route = item.route.toString()
-                    it.route?.split(".")?.last() == route
-                } == true,
+                selected = navBackStackEntry?.getRouteLastSegmentName() == item.route.toString(),
                 onClick = {
                     navController.navigate(item.route) {
                         popUpTo(navController.graph.startDestinationId) {
