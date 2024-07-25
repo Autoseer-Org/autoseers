@@ -16,14 +16,15 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
@@ -31,23 +32,38 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.innovara.autoseers.AuthState
 import com.innovara.autoseers.R
 import com.innovara.autoseers.onboarding.logic.OnboardingEvents
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CodeAuthenticationScreen(
+    authState: AuthState,
     modifier: Modifier = Modifier,
-    onCodeEntered: (String) -> Unit,
-    onBackPressed: () -> Unit,
-    onCodeAuthEvents: (OnboardingEvents) -> Unit,
+    onCodeEntered: (String) -> Unit = {},
+    onBackPressed: () -> Unit = {},
+    onCodeAuthEvents: (OnboardingEvents) -> Unit = {},
 ) {
     var code by remember {
         mutableStateOf("")
     }
-    val scope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
     val interactionSource = remember { MutableInteractionSource() }
+    val snackbarHostState = remember {
+        SnackbarHostState()
+    }
+
+    LaunchedEffect(key1 = authState) {
+        when (authState) {
+            is AuthState.PhoneVerificationInProgress -> {
+                if (authState.error) {
+                    snackbarHostState.showSnackbar(authState.errorMessage ?: "")
+                }
+            }
+            else -> Unit
+        }
+    }
     Scaffold(
         modifier,
         topBar = {
@@ -56,14 +72,20 @@ fun CodeAuthenticationScreen(
                     Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "")
                 }
             })
-        }) { it ->
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        }) { paddingValues ->
         Column(
             modifier = Modifier
-                .padding(it)
+                .padding(paddingValues)
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(text = stringResource(id = R.string.code_sent_title), style = MaterialTheme.typography.headlineLarge)
+            Text(
+                text = stringResource(id = R.string.code_sent_title),
+                style = MaterialTheme.typography.headlineLarge
+            )
             Text(text = stringResource(id = R.string.code_sent_message))
 
             TextField(

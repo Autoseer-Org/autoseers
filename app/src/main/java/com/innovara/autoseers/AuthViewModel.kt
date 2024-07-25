@@ -6,13 +6,11 @@ import androidx.lifecycle.ViewModel
 import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -21,6 +19,7 @@ import javax.inject.Inject
 
 data class AuthInProgressModel(
     val shouldTransitionToCodeScreen: Boolean,
+    val shouldTransitionToNameScreen: Boolean,
     val verificationId: String = "",
 )
 
@@ -31,11 +30,11 @@ data class AuthAuthenticatedModel(
 
 sealed class AuthState {
     data object NotAuthenticated : AuthState()
-    data class Error(
-        val message: String,
-    ) : AuthState()
-    data class InProgress(
+    data class PhoneVerificationInProgress(
         val authInProgressModel: AuthInProgressModel,
+        val loading: Boolean = false,
+        val errorMessage: String? = null,
+        val error: Boolean,
     ) : AuthState()
 
     data class UserAuthenticated(
@@ -71,7 +70,9 @@ class AuthViewModel @Inject constructor() : ViewModel() {
                         user?.getIdToken(true)?.addOnCompleteListener { tokenTask ->
                             _authState.update {
                                 AuthState.UserAuthenticated(
-                                    authAuthenticatedModel = AuthAuthenticatedModel(tokenId = tokenTask.result.token ?: "")
+                                    authAuthenticatedModel = AuthAuthenticatedModel(
+                                        tokenId = tokenTask.result.token ?: ""
+                                    )
                                 )
                             }
                         }
@@ -80,7 +81,17 @@ class AuthViewModel @Inject constructor() : ViewModel() {
                     task.isCanceled || task.exception != null -> {
                         // User encountered error
                         _authState.update {
-                            AuthState.Error("")
+                            when (it) {
+                                is AuthState.PhoneVerificationInProgress -> it.copy(
+                                    authInProgressModel = it.authInProgressModel.copy(
+                                        shouldTransitionToCodeScreen = false
+                                    ),
+                                    error = true,
+                                    errorMessage = "Verify code is correct",
+                                )
+
+                                else -> it
+                            }
                         }
                     }
                 }
@@ -98,10 +109,17 @@ class AuthViewModel @Inject constructor() : ViewModel() {
         activity: MainActivity,
         defaultTimeout: Long = 60L
     ) {
+        _authState.update {
+            AuthState.PhoneVerificationInProgress(
+                authInProgressModel = AuthInProgressModel(false, false),
+                error = false
+            )
+        }
         val options = PhoneAuthOptions.newBuilder()
             .setPhoneNumber(phoneNumber) // Phone number to verify
             .setTimeout(defaultTimeout, TimeUnit.SECONDS) // Timeout and unit
             .setActivity(activity) // Activity (for callback binding)
+            .setTimeout(15L, TimeUnit.SECONDS)
             .setCallbacks(
                 verificationStepsCallback(
                     auth,
@@ -126,14 +144,45 @@ class AuthViewModel @Inject constructor() : ViewModel() {
 
             override fun onVerificationFailed(exception: FirebaseException) {
                 Log.d("Verification process", "Verification failed")
-                when(exception) {
+                when (exception) {
                     is FirebaseAuthInvalidCredentialsException -> {
-                        _authState.update { AuthState.Error("Invalid request") }
+                        _authState.update {
+                            when (it) {
+                                is AuthState.PhoneVerificationInProgress -> it.copy(
+                                    error = true,
+                                    errorMessage = "fail to identify and/or authenticate the user subject of that operation."
+                                )
+
+                                else -> it
+                            }
+                        }
                     }
+
                     is FirebaseTooManyRequestsException -> {
-                        _authState.update { AuthState.Error("You have tried too times. Try again in 5 minutes.") }
+                        _authState.update {
+                            when (it) {
+                                is AuthState.PhoneVerificationInProgress -> it.copy(
+                                    error = true,
+                                    errorMessage = "Firebase service has been blocked due to having received too many consecutive requests from the same device. Retry the request later to resolve."
+                                )
+
+                                else -> it
+                            }
+                        }
                     }
-                    else -> _authState.update { AuthState.Error(exception.message ?: "") }
+
+                    else -> {
+                        _authState.update {
+                            when (it) {
+                                is AuthState.PhoneVerificationInProgress -> it.copy(
+                                    error = true,
+                                    errorMessage = "fail to identify and/or authenticate the user subject of that operation."
+                                )
+
+                                else -> it
+                            }
+                        }
+                    }
                 }
             }
 
@@ -144,11 +193,13 @@ class AuthViewModel @Inject constructor() : ViewModel() {
                 Log.d("Verification process", "Verification code sent")
                 super.onCodeSent(verificationId, token)
                 _authState.update {
-                    AuthState.InProgress(
+                    AuthState.PhoneVerificationInProgress(
                         authInProgressModel = AuthInProgressModel(
                             shouldTransitionToCodeScreen = true,
-                            verificationId = verificationId
-                        )
+                            shouldTransitionToNameScreen = false,
+                            verificationId = verificationId,
+                        ),
+                        error = false,
                     )
                 }
             }
@@ -165,33 +216,27 @@ class AuthViewModel @Inject constructor() : ViewModel() {
     }
 
     fun manualCodeEntered(code: String, auth: FirebaseAuth, activity: MainActivity) {
+        _authState.update {
+            when (it) {
+                is AuthState.PhoneVerificationInProgress -> {
+                    it.copy(error = false, errorMessage = null)
+                }
+
+                else -> it
+            }
+        }
         val currentState = authState.value
-        if (currentState is AuthState.InProgress) {
+        if (currentState is AuthState.PhoneVerificationInProgress) {
             val credentials = PhoneAuthProvider.getCredential(
                 currentState.authInProgressModel.verificationId,
                 code
             )
-
             signInWithPhoneAuthCredential(auth, credentials, activity)
         }
     }
 
-    fun nameEntered(name: String) {
-        when (authState.value) {
-            is AuthState.UserAuthenticated -> {
-                _authState.update {
-                    (it as AuthState.UserAuthenticated).copy(
-                        authAuthenticatedModel = it.authAuthenticatedModel.copy(userName = name)
-                    )
-                }
-                //TODO(adrian): Send request to BE to create user record in firestore
-            }
-
-            else -> Unit
-        }
-    }
-
-    fun resetAuthState() = _authState.update { AuthState.NotAuthenticated }
+    fun resetAuthState() =
+        _authState.update { AuthState.NotAuthenticated }
 
     companion object {
         private const val CURRENT_VERIFICATION_KEY = "CURRENT_VERIFICATION_KEY"

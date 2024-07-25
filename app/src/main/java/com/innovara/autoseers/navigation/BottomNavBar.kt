@@ -11,9 +11,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.innovara.autoseers.navigation.routes.GlobalRoute
+import com.innovara.autoseers.navigation.routes.homeroute.HomeRoute
+import com.innovara.autoseers.navigation.routes.maps.MapsRoute
 
 data class BottomNavItem(
-    val route: String,
+    val route: GlobalRoute,
     val icon: ImageVector,
     val label: String
 )
@@ -30,7 +33,7 @@ fun BottomNavBar(navController: NavController, items: List<BottomNavItem>) {
             BottomNavigationItem(
                 icon = { Icon(item.icon, contentDescription = item.label) },
                 label = { Text(item.label) },
-                selected = currentDestination?.hierarchy?.any { it.route == item.route } == true,
+                selected = currentDestination?.hierarchy?.any { it.route == item.route.toString() } == true,
                 onClick = {
                     navController.navigate(item.route) {
                         popUpTo(navController.graph.startDestinationId) {

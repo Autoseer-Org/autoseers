@@ -12,4 +12,8 @@
     <string name="code_sent_message">We\'ve sent a code to the phone number you provided us. Enter the verification code to confirm your identity!</string>
 
     <string name="next_button">Next</string>
+
+    <string name="name_title_screen">Let’s get to know each other</string>
+    <string name="name_description_screen">Tell us what your name is so we can always greet you when you open the app</string>
+    <string name="name_button_title">Finish setup</string>
 </resources>

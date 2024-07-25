@@ -1,6 +1,5 @@
 package com.innovara.autoseers.onboarding.ui
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -59,9 +58,11 @@ fun PhoneAuthenticationScreen(
     val focusManager = LocalFocusManager.current
     LaunchedEffect(key1 = authState) {
         when (authState) {
-            is AuthState.Error -> {
+            is AuthState.PhoneVerificationInProgress -> {
                 scope.launch {
-                    snackbarHostState.showSnackbar(authState.message)
+                    if (authState.error) {
+                        snackbarHostState.showSnackbar(authState.errorMessage ?: "")
+                    }
                 }
             }
             else -> Unit

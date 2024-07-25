@@ -25,8 +25,8 @@ class OnboardingServiceImpl @Inject constructor(
         flow {
             val response = api.sendOnboardingCompletion(onboardingRequest).await()
             when {
-                response.success -> OnboardingServiceState.OnboardingSuccess
-                else -> OnboardingServiceState.OnboardingFailed(response.reason)
+                response.reason.isNullOrBlank() -> emit(OnboardingServiceState.OnboardingSuccess)
+                else -> emit(OnboardingServiceState.OnboardingFailed(response.reason ?: ""))
             }
         }
 }

@@ -4,9 +4,8 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.innovara.autoseers.AuthState
-import com.innovara.autoseers.navigation.routes.homeroute.HomeRoute
+import com.innovara.autoseers.navigation.routes.AutoSeersExperience
 import com.innovara.autoseers.onboarding.logic.OnboardingEvents
-import com.innovara.autoseers.onboarding.logic.OnboardingViewModel
 import com.innovara.autoseers.onboarding.ui.CodeAuthenticationScreen
 import com.innovara.autoseers.onboarding.ui.InitialScreen
 import com.innovara.autoseers.onboarding.ui.NamePromptScreen
@@ -52,12 +51,14 @@ fun NavGraphBuilder.buildPhoneAuthenticationScreen(
 }
 
 fun NavGraphBuilder.buildCodeAuthScreen(
+    authState: AuthState,
     onCodeEntered: (String) -> Unit,
     onBackPressed: () -> Unit,
     onCodeAuthEvents: (OnboardingEvents) -> Unit,
 ) {
     composable<CodeRoute> {
         CodeAuthenticationScreen(
+            authState = authState,
             onCodeEntered = onCodeEntered,
             onBackPressed = onBackPressed,
             onCodeAuthEvents = onCodeAuthEvents,
@@ -67,15 +68,16 @@ fun NavGraphBuilder.buildCodeAuthScreen(
 
 fun NavGraphBuilder.buildNamePromptScreen(
     onNameEntered: (String) -> Unit,
+    onNameEnteredEvents: (OnboardingEvents) -> Unit,
 ) {
     composable<NamePromptRoute> {
-        NamePromptScreen(onNameEntered)
+        NamePromptScreen(onNameEntered, onNameEnteredEvents)
     }
 }
 
 
 // Nav Events
 fun NavController.navigateToPhoneAuthentication() = navigate(route = PhoneAuthenticationRoute)
-fun NavController.navigateToHomeScreen() = navigate(route = HomeRoute)
+fun NavController.navigateToAutoSeersExperience() = navigate(route = AutoSeersExperience)
 fun NavController.navigateToCodeScreen() = navigate(route = CodeRoute)
 fun NavController.navigateToNamePrompt() = navigate(route = NamePromptRoute)

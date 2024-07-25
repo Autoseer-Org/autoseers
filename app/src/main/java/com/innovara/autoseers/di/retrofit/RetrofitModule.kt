@@ -3,25 +3,38 @@ package com.innovara.autoseers.di.retrofit
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.json.Json
+import okhttp3.ConnectionSpec
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import javax.inject.Singleton
 
 @Module
-@InstallIn(ViewModelComponent::class)
+@InstallIn(SingletonComponent::class)
 object RetrofitModule {
     private const val BASE_URL = "https://autoseers-woegjoq56q-ue.a.run.app/"
 
     @Provides
+    @Singleton
     fun provideRetrofit(): Retrofit {
         val mediaType = "application/json".toMediaType()
+        val json = Json {
+            ignoreUnknownKeys = true
+        }
+        val logger = HttpLoggingInterceptor()
+        logger.setLevel(HttpLoggingInterceptor.Level.BODY)
+        val client = OkHttpClient.Builder()
+            .addInterceptor(logger)
+            .connectionSpecs(listOf(ConnectionSpec.MODERN_TLS, ConnectionSpec.COMPATIBLE_TLS))
+            .build()
         return Retrofit.Builder()
-            .client(OkHttpClient())
+            .client(client)
+            .addConverterFactory(json.asConverterFactory(mediaType))
             .baseUrl(BASE_URL)
-            .addConverterFactory(Json.asConverterFactory(mediaType))
             .build()
     }
 }

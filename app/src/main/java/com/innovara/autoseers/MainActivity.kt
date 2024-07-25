@@ -48,7 +48,6 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize()
                 ) {
                     val authState by authViewModel.authState.collectAsState()
-                    val onboardingViewModel = hiltViewModel<OnboardingViewModel>()
                     NavigationAppManager(
                         authState = authState,
                         onPhoneNumberEntered = { phoneNumber ->
@@ -65,9 +64,7 @@ class MainActivity : ComponentActivity() {
                                 activity = this
                             )
                         },
-                        onNameEntered = authViewModel::nameEntered,
                         resetAuthState = authViewModel::resetAuthState,
-                        handleAnalyticsEvents = onboardingViewModel.handleAnalyticsEvents()
                     )
                 }
             }

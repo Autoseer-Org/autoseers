@@ -1,5 +1,6 @@
 package com.innovara.autoseers.navigation
 
+import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -7,9 +8,14 @@ import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -27,10 +33,14 @@ import com.innovara.autoseers.navigation.routes.onboardingroute.buildNamePromptS
 import com.innovara.autoseers.navigation.routes.onboardingroute.buildOnboardingScreen
 import com.innovara.autoseers.navigation.routes.onboardingroute.buildPhoneAuthenticationScreen
 import com.innovara.autoseers.navigation.routes.onboardingroute.navigateToCodeScreen
+import com.innovara.autoseers.navigation.routes.onboardingroute.navigateToAutoSeersExperience
 import com.innovara.autoseers.navigation.routes.onboardingroute.navigateToNamePrompt
 import com.innovara.autoseers.navigation.routes.onboardingroute.navigateToPhoneAuthentication
 import com.innovara.autoseers.navigation.routes.settings.SettingsRoute
-import com.innovara.autoseers.onboarding.logic.OnboardingEvents
+import com.innovara.autoseers.onboarding.logic.OnboardingState
+import com.innovara.autoseers.onboarding.logic.OnboardingViewModel
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.launch
 
 
 /**
@@ -39,7 +49,6 @@ import com.innovara.autoseers.onboarding.logic.OnboardingEvents
  *
  * Uses home routes and onboarding routes to navigate between the 2 pages.
  * A routes describes how to get to a destination. A route can have a payload attached to it
- * TODO(adrian):  once the bottom navigation is implemented we should account for tab navigation
  */
 @Composable
 fun NavigationAppManager(
@@ -47,38 +56,40 @@ fun NavigationAppManager(
     navController: NavHostController = rememberNavController(),
     onPhoneNumberEntered: (String) -> Unit = {},
     onCodeEntered: (String) -> Unit = {},
-    onNameEntered: (String) -> Unit = {},
     authState: AuthState,
     resetAuthState: () -> Unit = {},
-    handleAnalyticsEvents: (OnboardingEvents) -> Unit = {}
 ) {
-    val currentScreen by navController.currentBackStackEntryAsState()
-    val shouldShowBottomNavBar = remember {
-        currentScreen
-            ?.getRouteLastSegmentName()
-            ?.isAllowedToSeeBottomNavBar(listOf("HomeRoute", "SettingsRoute", "MapsRoute")) == true
+    val scope = rememberCoroutineScope()
+    val onboardingViewModel = hiltViewModel<OnboardingViewModel>()
+    val onboardingState by onboardingViewModel.state.collectAsState()
+    val analyticsEvents = onboardingViewModel.handleAnalyticsEvents()
+
+    var shouldShowBottomNavBar by remember {
+        mutableStateOf(false)
     }
 
-    val shouldNavigateToCodeScreen =
+    val shouldNavigateToCodeScreen = remember(authState) {
         when (authState) {
-            is AuthState.InProgress -> authState.authInProgressModel.shouldTransitionToCodeScreen
+            is AuthState.PhoneVerificationInProgress -> authState.authInProgressModel.shouldTransitionToCodeScreen
             else -> false
         }
+    }
 
-    val shouldNavigateToNamePrompt =
+    val shouldNavigateToNamePrompt = remember(authState, shouldShowBottomNavBar) {
         when (authState) {
-            is AuthState.UserAuthenticated -> true
+            is AuthState.UserAuthenticated -> !shouldShowBottomNavBar
             else -> false
         }
+    }
 
     Scaffold(
         bottomBar = {
             if (shouldShowBottomNavBar) {
                 BottomNavBar(
                     navController = navController, items = listOf(
-                        BottomNavItem(HomeRoute.toString(), Icons.Default.Home, "home"),
-                        BottomNavItem(MapsRoute.toString(), Icons.Default.Place, "maps"),
-                        BottomNavItem(SettingsRoute.toString(), Icons.Default.Settings, "settings"),
+                        BottomNavItem(HomeRoute, Icons.Default.Home, "home"),
+                        BottomNavItem(MapsRoute, Icons.Default.Place, "maps"),
+                        BottomNavItem(SettingsRoute, Icons.Default.Settings, "settings"),
                     )
                 )
             }
@@ -106,19 +117,37 @@ fun NavigationAppManager(
                     navController.popBackStack()
                     resetAuthState()
                 },
-                onPhoneAuthEvents = handleAnalyticsEvents,
+                onPhoneAuthEvents = analyticsEvents,
             )
             buildCodeAuthScreen(
+                authState = authState,
                 onCodeEntered = onCodeEntered,
                 onBackPressed = {
                     navController.popBackStack()
                     resetAuthState()
                 },
-                onCodeAuthEvents = handleAnalyticsEvents,
+                onCodeAuthEvents = analyticsEvents,
             )
 
             buildNamePromptScreen(
-                onNameEntered = onNameEntered
+                onNameEntered = { name ->
+                    scope.launch(CoroutineExceptionHandler { _, error ->
+                        Log.e("ERROR", error.message ?: "")
+                    }) {
+                        if (authState is AuthState.UserAuthenticated) {
+                            onboardingViewModel.sendOnboardingData(
+                                tokenId = authState.authAuthenticatedModel.tokenId,
+                                username = name
+                            )
+                        }
+                    }.invokeOnCompletion {
+                        if (onboardingState is OnboardingState.NewUserCreated) {
+                            navController.navigateToAutoSeersExperience()
+                            shouldShowBottomNavBar = true
+                        }
+                    }
+                },
+                onNameEnteredEvents = analyticsEvents,
             )
             navigation<AutoSeersExperience>(startDestination = HomeRoute) {
                 buildHomeScreen()

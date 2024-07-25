@@ -5,16 +5,14 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class OnboardingRequest(
-    @SerialName("token_id")
-    val tokenId: String,
-    @SerialName("user_name")
+    @SerialName("name")
     val userName: String,
+    @SerialName("token")
+    val tokenId: String,
 )
 
 @Serializable
 data class OnboardingResponse(
-    @SerialName("success")
-    val success: Boolean,
-    @SerialName("reason")
-    val reason: String,
+    @SerialName("failure")
+    val reason: String? = null,
 )

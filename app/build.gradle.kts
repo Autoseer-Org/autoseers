@@ -101,6 +101,7 @@ dependencies {
     //Network
     implementation(libs.retrofit)
     implementation(libs.converter.kotlinx.serialization)
+    implementation(libs.logging.interceptor)
     implementation(libs.okhttp)
 }
 
