@@ -8,16 +8,11 @@ import com.google.firebase.auth.auth
 import javax.inject.Inject
 
 interface FirebaseService {
-    fun auth(): FirebaseAuth
+    val auth: FirebaseAuth
     fun analytics(): FirebaseAnalytics
 }
 
 class FirebaseServiceImpl @Inject constructor() : FirebaseService {
-    override fun auth(): FirebaseAuth {
-        return Firebase.auth
-    }
-
-    override fun analytics(): FirebaseAnalytics {
-        return Firebase.analytics
-    }
+    override val auth: FirebaseAuth = Firebase.auth
+    override fun analytics(): FirebaseAnalytics = Firebase.analytics
 }

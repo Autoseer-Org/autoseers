@@ -27,7 +27,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        val auth = firebaseService.auth()
+        val auth = firebaseService.auth
         when (auth.currentUser) {
             null -> {
                 // User is not sign in. Take them to the onboarding page
@@ -52,7 +52,7 @@ class MainActivity : ComponentActivity() {
                         authState = authState,
                         onPhoneNumberEntered = { phoneNumber ->
                             authViewModel.createPhoneAuthOptions(
-                                auth = firebaseService.auth(),
+                                auth = firebaseService.auth,
                                 phoneNumber = phoneNumber,
                                 activity = this
                             )
@@ -60,7 +60,7 @@ class MainActivity : ComponentActivity() {
                         onCodeEntered = {
                             authViewModel.manualCodeEntered(
                                 code = it,
-                                auth = firebaseService.auth(),
+                                auth = firebaseService.auth,
                                 activity = this
                             )
                         },

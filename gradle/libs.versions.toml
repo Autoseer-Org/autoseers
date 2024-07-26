@@ -23,6 +23,8 @@ kotlinxSerializationJson = "1.6.3"
 uiTestJunit4 = "1.6.8"
 uiTestManifest = "1.6.8"
 googleServices = "4.4.2"
+googleServicesVersion = "4.4.2"
+firebaseConfig = "22.0.0"
 
 
 [libraries]
@@ -58,6 +60,8 @@ okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "uiTestJunit4" }
 ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "uiTestManifest" }
+google-services = { group = "com.google.gms", name = "google-services", version.ref = "googleServicesVersion" }
+firebase-config = { group = "com.google.firebase", name = "firebase-config", version.ref = "firebaseConfig" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

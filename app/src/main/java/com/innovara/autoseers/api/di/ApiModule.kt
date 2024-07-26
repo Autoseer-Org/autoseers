@@ -1,5 +1,7 @@
 package com.innovara.autoseers.api.di
 
+import com.innovara.autoseers.api.home.HomeService
+import com.innovara.autoseers.api.home.HomeServiceImpl
 import com.innovara.autoseers.api.onboarding.OnboardingService
 import com.innovara.autoseers.api.onboarding.OnboardingServiceImpl
 import dagger.Module
@@ -16,4 +18,9 @@ object ApiModule {
         retrofit: Retrofit
     ): OnboardingService =
         OnboardingServiceImpl(retrofit)
+
+    @Provides
+    fun provideHomeService(
+        retrofit: Retrofit,
+    ): HomeService = HomeServiceImpl(retrofit)
 }
