@@ -42,7 +42,7 @@ class HomeViewModel @Inject constructor(
     val homeState: StateFlow<HomeState> = _homeState
 
     private val _uploadState: MutableStateFlow<UploadState> = MutableStateFlow(UploadState.Idle)
-    private val uploadState: StateFlow<UploadState> = _uploadState
+    val uploadState: StateFlow<UploadState> = _uploadState
 
     suspend fun getHomeData(tokenId: String) {
         homeService

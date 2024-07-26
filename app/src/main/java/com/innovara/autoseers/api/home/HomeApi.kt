@@ -9,6 +9,6 @@ interface HomeApi {
     @POST("/upload")
     fun uploadReport(@Body uploadRequest: HomeUploadRequest): Call<HomeUploadResponse>
 
-    @GET("/home")
+    @POST("/home")
     fun fetchHomeData(@Body homeRequest: HomeRequest): Call<HomeResponse>
 }

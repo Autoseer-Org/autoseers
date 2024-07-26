@@ -105,7 +105,7 @@ fun NavigationAppManager(
         NavHost(
             modifier = Modifier.padding(it),
             navController = navController,
-            startDestination = AutoSeersExperience
+            startDestination = startDestination
         ) {
             buildOnboardingScreen(navigateToPhoneAuthentication = {
                 navController.navigateToPhoneAuthentication()
@@ -142,6 +142,7 @@ fun NavigationAppManager(
                         }
                     }.invokeOnCompletion {
                         if (onboardingState is OnboardingState.NewUserCreated) {
+                            shouldShowBottomNavBar = true
                             navController.navigateToAutoSeersExperience()
                         }
                     }
@@ -149,8 +150,7 @@ fun NavigationAppManager(
                 onNameEnteredEvents = analyticsEvents,
             )
             navigation<AutoSeersExperience>(startDestination = HomeRoute) {
-                shouldShowBottomNavBar = true
-                buildHomeScreen()
+                buildHomeScreen(authState)
                 composable<MapsRoute> { }
                 composable<SettingsRoute> { }
             }

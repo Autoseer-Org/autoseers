@@ -1,6 +1,7 @@
 package com.innovara.autoseers.api.home
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import retrofit2.Retrofit
 import retrofit2.await
@@ -62,6 +63,8 @@ class HomeServiceImpl @Inject constructor(
             response.data != null -> emit(response.data.toHomeServiceLoadedState())
             else -> emit(HomeServiceState.Empty)
         }
+    }.catch {
+        emit(HomeServiceState.Empty)
     }
 
     private fun HomeData.toHomeServiceLoadedState() = HomeServiceState.Loaded(
