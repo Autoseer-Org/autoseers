@@ -39,6 +39,7 @@ sealed class AuthState {
 
     data class UserAuthenticated(
         val authAuthenticatedModel: AuthAuthenticatedModel,
+        val shouldSkipNameStep: Boolean = false,
     ) : AuthState()
 }
 
@@ -235,8 +236,8 @@ class AuthViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    fun resetAuthState() =
-        _authState.update { AuthState.NotAuthenticated }
+    fun resetAuthState(authState: AuthState? = null) =
+        _authState.update { authState ?: AuthState.NotAuthenticated }
 
     companion object {
         private const val CURRENT_VERIFICATION_KEY = "CURRENT_VERIFICATION_KEY"

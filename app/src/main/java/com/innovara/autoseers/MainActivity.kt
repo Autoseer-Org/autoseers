@@ -35,6 +35,17 @@ class MainActivity : ComponentActivity() {
 
             else -> {
                 // User is signed in. Take them to the home page
+                auth.currentUser?.getIdToken(true)?.addOnCompleteListener {
+                    authViewModel.resetAuthState(
+                        authState = AuthState.UserAuthenticated(
+                            authAuthenticatedModel = AuthAuthenticatedModel(
+                                tokenId = it.result.token ?: "",
+                                userName = auth.currentUser?.displayName ?: ""
+                            ),
+                            shouldSkipNameStep = true
+                        )
+                    )
+                }
             }
         }
 
@@ -65,6 +76,9 @@ class MainActivity : ComponentActivity() {
                             )
                         },
                         resetAuthState = authViewModel::resetAuthState,
+                        onLogoutPressed = {
+                            firebaseService.auth.signOut()
+                        }
                     )
                 }
             }

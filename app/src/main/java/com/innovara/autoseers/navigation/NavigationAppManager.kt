@@ -37,6 +37,7 @@ import com.innovara.autoseers.navigation.routes.onboardingroute.navigateToAutoSe
 import com.innovara.autoseers.navigation.routes.onboardingroute.navigateToNamePrompt
 import com.innovara.autoseers.navigation.routes.onboardingroute.navigateToPhoneAuthentication
 import com.innovara.autoseers.navigation.routes.settings.SettingsRoute
+import com.innovara.autoseers.navigation.routes.settings.buildSettingsScreen
 import com.innovara.autoseers.onboarding.logic.OnboardingState
 import com.innovara.autoseers.onboarding.logic.OnboardingViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -58,6 +59,7 @@ fun NavigationAppManager(
     onCodeEntered: (String) -> Unit = {},
     authState: AuthState,
     resetAuthState: () -> Unit = {},
+    onLogoutPressed: () -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
     val onboardingViewModel = hiltViewModel<OnboardingViewModel>()
@@ -77,7 +79,16 @@ fun NavigationAppManager(
 
     val shouldNavigateToNamePrompt = remember(authState, shouldShowBottomNavBar) {
         when (authState) {
-            is AuthState.UserAuthenticated -> !shouldShowBottomNavBar
+            is AuthState.UserAuthenticated -> {
+                if (authState.shouldSkipNameStep) {
+                    navController.navigateToAutoSeersExperience()
+                    shouldShowBottomNavBar = true
+                    false
+                } else {
+                    !shouldShowBottomNavBar
+                }
+            }
+
             else -> false
         }
     }
@@ -152,7 +163,9 @@ fun NavigationAppManager(
             navigation<AutoSeersExperience>(startDestination = HomeRoute) {
                 buildHomeScreen(authState)
                 composable<MapsRoute> { }
-                composable<SettingsRoute> { }
+                buildSettingsScreen(authState, onLogoutPress = {
+                    onLogoutPressed()
+                })
             }
         }
     }

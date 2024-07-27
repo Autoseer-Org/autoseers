@@ -27,8 +27,10 @@ data class HomeData(
     val repairs: Int,
     @SerialName("reports")
     val reports: Int,
-    @SerialName("modelMake")
-    val modelMake: String,
+    @SerialName("make")
+    val make: String? = null,
+    @SerialName("model")
+    val model: String? = null,
 )
 
 @Serializable

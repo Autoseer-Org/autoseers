@@ -70,7 +70,7 @@ class HomeServiceImpl @Inject constructor(
     private fun HomeData.toHomeServiceLoadedState() = HomeServiceState.Loaded(
         mileage = mileage ?: 0,
         alerts = alerts,
-        carModelMake = modelMake,
+        carModelMake = "$make $model",
         health = healthScore,
         repairs = repairs,
         uploads = reports
