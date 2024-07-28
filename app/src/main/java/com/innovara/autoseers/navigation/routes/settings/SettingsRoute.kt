@@ -3,9 +3,7 @@ package com.innovara.autoseers.navigation.routes.settings
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.innovara.autoseers.AuthState
-import com.innovara.autoseers.home.ui.HomeScreen
 import com.innovara.autoseers.navigation.routes.GlobalRoute
-import com.innovara.autoseers.navigation.routes.homeroute.HomeRoute
 import com.innovara.autoseers.settings.ui.SettingsPage
 import kotlinx.serialization.Serializable
 

@@ -107,6 +107,9 @@ dependencies {
 
     //Activity
     implementation(libs.androidx.activity.ktx)
+
+    //Lottie files
+    implementation(libs.lottie.compose)
 }
 
 // Allow references to generated code

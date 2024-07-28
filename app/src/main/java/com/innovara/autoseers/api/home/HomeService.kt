@@ -54,9 +54,12 @@ class HomeServiceImpl @Inject constructor(
 
             UploadStatus.PROCESSING -> emit(UploadServiceState.Loading)
         }
+    }.catch {
+        emit(UploadServiceState.Loading)
     }
 
     override suspend fun getHomeData(tokenId: String): Flow<HomeServiceState> = flow {
+        emit(HomeServiceState.Loading)
         val request = HomeRequest(tokenId = tokenId)
         val response = homeApi.fetchHomeData(homeRequest = request).await()
         when {

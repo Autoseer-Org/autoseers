@@ -9,6 +9,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.compose.AutoSeersTheme
 import com.innovara.autoseers.di.firebase.FirebaseService
@@ -31,11 +32,12 @@ class MainActivity : ComponentActivity() {
         when (auth.currentUser) {
             null -> {
                 // User is not sign in. Take them to the onboarding page
+
             }
 
             else -> {
                 // User is signed in. Take them to the home page
-                auth.currentUser?.getIdToken(true)?.addOnCompleteListener {
+                auth.currentUser?.getIdToken(false)?.addOnCompleteListener {
                     authViewModel.resetAuthState(
                         authState = AuthState.UserAuthenticated(
                             authAuthenticatedModel = AuthAuthenticatedModel(
