@@ -42,20 +42,17 @@ class HomeServiceImpl @Inject constructor(
         tokenId: String,
         image: ByteArray
     ): Flow<UploadServiceState> = flow {
+        emit(UploadServiceState.Loading)
         val request = HomeUploadRequest(tokenId = tokenId, image = image)
         val response = homeApi.uploadReport(request).await()
-        when (val homeUploadResultStatus = response.status) {
-            UploadStatus.SUCCESS -> emit(UploadServiceState.Success)
-            UploadStatus.PARSED_FAILURE, UploadStatus.UNKNOWN -> emit(
-                UploadServiceState.Failed(
-                    "Could not process your image due to $homeUploadResultStatus error"
-                )
-            )
-
-            UploadStatus.PROCESSING -> emit(UploadServiceState.Loading)
+        when {
+            response.failure != "" -> emit(UploadServiceState.Failed(
+                "Could not process your image due to ${response.failure} error"
+            ))
+            else -> emit(UploadServiceState.Success)
         }
     }.catch {
-        emit(UploadServiceState.Loading)
+        emit(UploadServiceState.Failed(reason = it.localizedMessage ?: ""))
     }
 
     override suspend fun getHomeData(tokenId: String): Flow<HomeServiceState> = flow {
@@ -67,6 +64,7 @@ class HomeServiceImpl @Inject constructor(
             else -> emit(HomeServiceState.Empty)
         }
     }.catch {
+        println(it.message)
         emit(HomeServiceState.Empty)
     }
 

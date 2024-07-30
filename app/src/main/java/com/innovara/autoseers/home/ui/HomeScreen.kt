@@ -88,6 +88,9 @@ fun HomeScreen(
                 duration = SnackbarDuration.Long
             )
         }
+        if (uploadState is UploadState.Success) {
+            homeViewModel.getHomeData(authState.authAuthenticatedModel.tokenId)
+        }
     }
     val carReportPicker =
         rememberLauncherForActivityResult(

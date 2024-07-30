@@ -12,7 +12,9 @@ data class HomeRequest(
 @Serializable
 data class HomeResponse(
     @SerialName("data")
-    val data: HomeData? = null
+    val data: HomeData? = null,
+    @SerialName("failure")
+    val failure: String? = null
 )
 
 @Serializable
@@ -37,7 +39,7 @@ data class HomeData(
 data class HomeUploadRequest(
     @SerialName("token")
     val tokenId: String,
-    @Serializable
+    @SerialName("image")
     val image: ByteArray
 ) {
     override fun equals(other: Any?): Boolean {
@@ -61,14 +63,6 @@ data class HomeUploadRequest(
 
 @Serializable
 data class HomeUploadResponse(
-    @SerialName("status")
-    val status: UploadStatus
+    @SerialName("failure")
+    val failure: String
 )
-
-@Serializable
-enum class UploadStatus(status: String) {
-    PARSED_FAILURE("parsed_failure"),
-    PROCESSING("processing"),
-    SUCCESS("success"),
-    UNKNOWN("unknown");
-}
