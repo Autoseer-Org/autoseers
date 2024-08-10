@@ -1,6 +1,7 @@
 package com.innovara.autoseers
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -37,16 +38,24 @@ class MainActivity : ComponentActivity() {
 
             else -> {
                 // User is signed in. Take them to the home page
-                auth.currentUser?.getIdToken(false)?.addOnCompleteListener {
-                    authViewModel.resetAuthState(
-                        authState = AuthState.UserAuthenticated(
-                            authAuthenticatedModel = AuthAuthenticatedModel(
-                                tokenId = it.result.token ?: "",
-                                userName = auth.currentUser?.displayName ?: ""
-                            ),
-                            shouldSkipNameStep = true
-                        )
-                    )
+                auth.currentUser?.getIdToken(false)
+                    ?.addOnFailureListener {
+                        Log.e("TASK", it.localizedMessage ?: "")
+                    }
+                    ?.addOnCompleteListener {
+                         if (it.exception != null) {
+                            return@addOnCompleteListener
+                        }else {
+                            authViewModel.resetAuthState(
+                                authState = AuthState.UserAuthenticated(
+                                    authAuthenticatedModel = AuthAuthenticatedModel(
+                                        tokenId = it.result.token ?: "",
+                                        userName = auth.currentUser?.displayName ?: ""
+                                    ),
+                                    shouldSkipNameStep = true
+                                )
+                            )
+                        }
                 }
             }
         }

@@ -47,7 +47,7 @@ class HomeServiceImpl @Inject constructor(
         val response = homeApi.uploadReport(request).await()
         when {
             response.failure != "" -> emit(UploadServiceState.Failed(
-                "Could not process your image due to ${response.failure} error"
+                "Could not process your image due to ${response.failure}"
             ))
             else -> emit(UploadServiceState.Success)
         }

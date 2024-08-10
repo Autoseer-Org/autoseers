@@ -5,6 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.innovara.autoseers.AuthState
 import com.innovara.autoseers.navigation.routes.AutoSeersExperience
+import com.innovara.autoseers.navigation.routes.homeroute.HomeRoute
 import com.innovara.autoseers.onboarding.logic.OnboardingEvents
 import com.innovara.autoseers.onboarding.ui.CodeAuthenticationScreen
 import com.innovara.autoseers.onboarding.ui.InitialScreen
@@ -78,6 +79,9 @@ fun NavGraphBuilder.buildNamePromptScreen(
 
 // Nav Events
 fun NavController.navigateToPhoneAuthentication() = navigate(route = PhoneAuthenticationRoute)
-fun NavController.navigateToAutoSeersExperience() = navigate(route = AutoSeersExperience)
+fun NavController.navigateToAutoSeersExperience() = navigate(route = AutoSeersExperience) {
+    popBackStack(route = HomeRoute, inclusive = false) // Assumes HomeRoute is the root of the nested graph
+}
+
 fun NavController.navigateToCodeScreen() = navigate(route = CodeRoute)
 fun NavController.navigateToNamePrompt() = navigate(route = NamePromptRoute)

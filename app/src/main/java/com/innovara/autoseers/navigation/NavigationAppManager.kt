@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,7 +25,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.innovara.autoseers.AuthState
 import com.innovara.autoseers.navigation.routes.AutoSeersExperience
+import com.innovara.autoseers.navigation.routes.homeroute.AlertRoute
 import com.innovara.autoseers.navigation.routes.homeroute.HomeRoute
+import com.innovara.autoseers.navigation.routes.homeroute.buildAlertsPage
 import com.innovara.autoseers.navigation.routes.homeroute.buildHomeScreen
 import com.innovara.autoseers.navigation.routes.maps.MapsRoute
 import com.innovara.autoseers.navigation.routes.onboardingroute.OnboardingRoute
@@ -53,7 +56,6 @@ import kotlinx.coroutines.launch
  */
 @Composable
 fun NavigationAppManager(
-    startDestination: OnboardingRoute = OnboardingRoute,
     navController: NavHostController = rememberNavController(),
     onPhoneNumberEntered: (String) -> Unit = {},
     onCodeEntered: (String) -> Unit = {},
@@ -72,7 +74,9 @@ fun NavigationAppManager(
 
     val shouldNavigateToCodeScreen = remember(authState) {
         when (authState) {
-            is AuthState.PhoneVerificationInProgress -> authState.authInProgressModel.shouldTransitionToCodeScreen
+            is AuthState.PhoneVerificationInProgress ->
+                authState.authInProgressModel.shouldTransitionToCodeScreen
+
             else -> false
         }
     }
@@ -116,7 +120,7 @@ fun NavigationAppManager(
         NavHost(
             modifier = Modifier.padding(it),
             navController = navController,
-            startDestination = startDestination
+            startDestination = if (authState is AuthState.UserAuthenticated && authState.shouldSkipNameStep) AutoSeersExperience else OnboardingRoute
         ) {
             buildOnboardingScreen(navigateToPhoneAuthentication = {
                 navController.navigateToPhoneAuthentication()
@@ -152,7 +156,7 @@ fun NavigationAppManager(
                             )
                         }
                     }.invokeOnCompletion {
-                        if (onboardingState is OnboardingState.NewUserCreated) {
+                        if (onboardingState is OnboardingState.NewUserCreated && authState is AuthState.UserAuthenticated) {
                             shouldShowBottomNavBar = true
                             navController.navigateToAutoSeersExperience()
                         }
@@ -161,10 +165,17 @@ fun NavigationAppManager(
                 onNameEnteredEvents = analyticsEvents,
             )
             navigation<AutoSeersExperience>(startDestination = HomeRoute) {
-                buildHomeScreen(authState)
+                buildHomeScreen(authState) {
+                    navController.navigate(AlertRoute)
+                }
+                buildAlertsPage(authState) {
+                    navController.popBackStack()
+                }
                 composable<MapsRoute> { }
                 buildSettingsScreen(authState, onLogoutPress = {
                     onLogoutPressed()
+                    resetAuthState()
+                    shouldShowBottomNavBar = false
                 })
             }
         }

@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -66,6 +65,7 @@ import kotlinx.coroutines.launch
 fun HomeScreen(
     authState: AuthState.UserAuthenticated,
     homeViewModel: HomeViewModel = hiltViewModel<HomeViewModel>(),
+    navigateToAlerts: () -> Unit,
     onFailToUploadImage: () -> Unit = {},
 ) {
     var uri by remember {
@@ -140,8 +140,13 @@ fun HomeScreen(
         Surface(modifier = Modifier.padding(it)) {
             when (val homeState = state) {
                 is HomeState.Empty -> EmptyHomeUi(uploadState = uploadState)
-                is HomeState.Loading -> LoadingHomeUi()
-                is HomeState.Loaded -> LoadedHomeUi(homeState.homeModel)
+                is HomeState.Loading -> LoadingIndicator()
+                is HomeState.Loaded -> LoadedHomeUi(
+                    homeState.homeModel,
+                    navigateToAlerts = navigateToAlerts,
+                    uploadState = uploadState,
+                    authState = authState
+                )
             }
         }
     }
@@ -155,7 +160,10 @@ fun EmptyHomeUi(modifier: Modifier = Modifier, uploadState: UploadState) {
         modifier = modifier
             .fillMaxSize()
     ) {
-        Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             if (uploadState is UploadState.Uploading) {
                 LottieAnimation(
                     modifier = Modifier.size(200.dp),
@@ -183,7 +191,7 @@ fun AnimatedText() {
     val stateFlow = remember {
         AnimatedTextValues.createStateFlow()
     }
-    val state by stateFlow. collectAsState(initial = AnimatedTextValues.FIRST_TEXT)
+    val state by stateFlow.collectAsState(initial = AnimatedTextValues.FIRST_TEXT)
     AnimatedContent(
         targetState = state,
         transitionSpec = {
@@ -199,7 +207,7 @@ fun AnimatedText() {
 }
 
 enum class AnimatedTextValues(val value: String) {
-    FIRST_TEXT("Hang tight! We're processing your file. Do not leave this page"),
+    FIRST_TEXT("Hang tight! We're processing your file."),
     SECOND_TEXT("Gemini is wrapping things up."),
     THIRD_TEXT("Finalizing your request. Almost there!");
 

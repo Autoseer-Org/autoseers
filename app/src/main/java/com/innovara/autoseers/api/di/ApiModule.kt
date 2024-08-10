@@ -1,5 +1,7 @@
 package com.innovara.autoseers.api.di
 
+import com.innovara.autoseers.api.home.AlertsService
+import com.innovara.autoseers.api.home.AlertsServiceImpl
 import com.innovara.autoseers.api.home.HomeService
 import com.innovara.autoseers.api.home.HomeServiceImpl
 import com.innovara.autoseers.api.onboarding.OnboardingService
@@ -23,4 +25,9 @@ object ApiModule {
     fun provideHomeService(
         retrofit: Retrofit,
     ): HomeService = HomeServiceImpl(retrofit)
+
+    @Provides
+    fun provideAlertService(
+        retrofit: Retrofit,
+    ): AlertsService = AlertsServiceImpl(retrofit)
 }
