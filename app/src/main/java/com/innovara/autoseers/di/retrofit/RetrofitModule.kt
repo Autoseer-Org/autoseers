@@ -11,6 +11,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import java.time.Duration
 import javax.inject.Singleton
 
 @Module
@@ -29,6 +30,9 @@ object RetrofitModule {
         logger.setLevel(HttpLoggingInterceptor.Level.BODY)
         val client = OkHttpClient.Builder()
             .addInterceptor(logger)
+            .callTimeout(Duration.ofMillis(25_000))
+            .connectTimeout(Duration.ofMillis(25_000))
+            .readTimeout(Duration.ofMillis(25_000))
             .connectionSpecs(listOf(ConnectionSpec.MODERN_TLS, ConnectionSpec.COMPATIBLE_TLS))
             .build()
         return Retrofit.Builder()

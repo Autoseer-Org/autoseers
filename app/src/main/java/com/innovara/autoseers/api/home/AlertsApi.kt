@@ -7,4 +7,7 @@ import retrofit2.http.POST
 interface AlertsApi {
     @POST("/alerts")
     fun fetchAlerts(@Body alertsRequest: AlertsRequest): Call<AlertsResponse>
+
+    @POST("/bookAppointment")
+    fun bookAppointment(@Body appointmentBookingRequest: AppointmentBookingRequest): Call<AppointmentBookingResponse>
 }

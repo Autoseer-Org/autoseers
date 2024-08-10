@@ -8,7 +8,6 @@ import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,13 +19,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.innovara.autoseers.AuthState
 import com.innovara.autoseers.navigation.routes.AutoSeersExperience
-import com.innovara.autoseers.navigation.routes.homeroute.AlertRoute
+import com.innovara.autoseers.navigation.routes.homeroute.AlertsRoute
 import com.innovara.autoseers.navigation.routes.homeroute.HomeRoute
+import com.innovara.autoseers.navigation.routes.homeroute.buildAlertPage
 import com.innovara.autoseers.navigation.routes.homeroute.buildAlertsPage
 import com.innovara.autoseers.navigation.routes.homeroute.buildHomeScreen
 import com.innovara.autoseers.navigation.routes.maps.MapsRoute
@@ -166,9 +165,14 @@ fun NavigationAppManager(
             )
             navigation<AutoSeersExperience>(startDestination = HomeRoute) {
                 buildHomeScreen(authState) {
-                    navController.navigate(AlertRoute)
+                    navController.navigate(AlertsRoute)
                 }
-                buildAlertsPage(authState) {
+                buildAlertsPage(
+                    authState,
+                    onBackPress = { navController.popBackStack() }) { alertRoute ->
+                    navController.navigate(alertRoute)
+                }
+                buildAlertPage(authState) {
                     navController.popBackStack()
                 }
                 composable<MapsRoute> { }

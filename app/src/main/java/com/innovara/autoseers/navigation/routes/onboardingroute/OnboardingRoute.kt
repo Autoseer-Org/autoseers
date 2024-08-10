@@ -80,7 +80,11 @@ fun NavGraphBuilder.buildNamePromptScreen(
 // Nav Events
 fun NavController.navigateToPhoneAuthentication() = navigate(route = PhoneAuthenticationRoute)
 fun NavController.navigateToAutoSeersExperience() = navigate(route = AutoSeersExperience) {
-    popBackStack(route = HomeRoute, inclusive = false) // Assumes HomeRoute is the root of the nested graph
+    try {
+        popBackStack(route = HomeRoute, inclusive = false) // Assumes HomeRoute is the root of the nested graph
+    }catch (e: Exception) {
+        println(e.localizedMessage)
+    }
 }
 
 fun NavController.navigateToCodeScreen() = navigate(route = CodeRoute)

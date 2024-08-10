@@ -64,5 +64,5 @@ data class HomeUploadRequest(
 @Serializable
 data class HomeUploadResponse(
     @SerialName("failure")
-    val failure: String
+    val failure: String? = null
 )

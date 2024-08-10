@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.innovara.autoseers.api.home.Alert
 import com.innovara.autoseers.api.home.AlertsService
 import com.innovara.autoseers.api.home.AlertsServiceState
+import com.innovara.autoseers.api.home.AppointmentBookingRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,10 +22,23 @@ sealed class AlertsState {
     ) : AlertsState()
 }
 
+data class CreateServiceBookingModel(
+    val token: String,
+    val partName: String,
+    val email: String,
+    val place: String,
+    val time: String,
+)
+
+sealed class BookingState {
+    data object Loading : BookingState()
+    data object Failed : BookingState()
+}
+
 @HiltViewModel
 class AlertsViewModel @Inject constructor(
     private val alertsService: AlertsService,
-): ViewModel() {
+) : ViewModel() {
     private val _state: MutableStateFlow<AlertsState> = MutableStateFlow(AlertsState.Empty)
     val state: StateFlow<AlertsState> = _state.asStateFlow()
     suspend fun getAlerts(token: String) = alertsService
@@ -41,4 +55,23 @@ class AlertsViewModel @Inject constructor(
                 AlertsServiceState.Loading -> _state.update { AlertsState.Loading }
             }
         }
+
+    suspend fun bookAppointment(createServiceBookingModel: CreateServiceBookingModel) {
+        alertsService.bookAppointment(
+            createServiceBookingModel.toAppointmentBookingRequest()
+        ).collectLatest {
+
+        }
+    }
+
+    suspend fun markAsRepair() {
+
+    }
+
+    fun CreateServiceBookingModel.toAppointmentBookingRequest() = AppointmentBookingRequest(
+        token = this.token,
+        email = this.email,
+        place = this.place,
+        timeDate = this.time,
+    )
 }

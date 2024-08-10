@@ -17,8 +17,22 @@ sealed class AlertsServiceState {
     data object Failed : AlertsServiceState()
 }
 
+sealed class BookAppointmentState {
+    data object Loading : BookAppointmentState()
+    data object AppointmentProcessed : BookAppointmentState()
+    data object Failed : BookAppointmentState()
+}
+
+sealed class MarkAsRepairState {
+    data object Loading: MarkAsRepairState()
+    data object Repaired: MarkAsRepairState()
+    data object Failed: MarkAsRepairState()
+}
+
 interface AlertsService {
     suspend fun getAlerts(token: String): Flow<AlertsServiceState>
+    suspend fun bookAppointment(appointmentBookingRequest: AppointmentBookingRequest): Flow<BookAppointmentState>
+    suspend fun markAsRepaired(markAsRepairRequest: MarkAsRepairRequest): Flow<MarkAsRepairState>
 }
 
 class AlertsServiceImpl @Inject constructor(
@@ -36,5 +50,21 @@ class AlertsServiceImpl @Inject constructor(
     }.catch {
         println(it.localizedMessage)
         emit(AlertsServiceState.Failed)
+    }
+
+    override suspend fun bookAppointment(appointmentBookingRequest: AppointmentBookingRequest): Flow<BookAppointmentState> =
+        flow {
+            emit(BookAppointmentState.Loading)
+            val response = api.bookAppointment(appointmentBookingRequest).await()
+            when {
+                response.failure == null -> emit(BookAppointmentState.AppointmentProcessed)
+                else -> emit(BookAppointmentState.Failed)
+            }
+        }.catch {
+            emit(BookAppointmentState.Failed)
+        }
+
+    override suspend fun markAsRepaired(markAsRepairRequest: MarkAsRepairRequest): Flow<MarkAsRepairState> = flow {
+        emit(MarkAsRepairState.Loading)
     }
 }

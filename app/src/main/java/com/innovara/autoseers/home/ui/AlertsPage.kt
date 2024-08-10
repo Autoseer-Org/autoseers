@@ -1,6 +1,7 @@
 package com.innovara.autoseers.home.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,18 +39,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.innovara.autoseers.home.AlertsState
 import com.innovara.autoseers.home.model.AlertModel
+import com.innovara.autoseers.navigation.routes.homeroute.AlertRoute
+import com.innovara.autoseers.navigation.routes.homeroute.AlertsRoute
 import com.innovara.autoseers.utils.toDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlertsPage(
     state: AlertsState,
-    onBackPress: () -> Unit,
+    onBackPress: () -> Unit = {},
+    navigateToAlert: (AlertRoute) -> Unit = {},
 ) {
     when (state) {
         is AlertsState.Loading -> {
             LoadingIndicator()
         }
+
         is AlertsState.Loaded -> {
             val listState = remember {
                 state.alerts.toMutableStateList()
@@ -93,11 +98,18 @@ fun AlertsPage(
                         )
                         Spacer(modifier = Modifier.height(24.dp))
                     }
-                    items(listState, key = { alert ->
-                        alert.name
-                    }) { alert ->
+                    items(listState) { alert ->
                         AlertCard(
-                            modifier = Modifier.clip(shape = RoundedCornerShape(12.dp)),
+                            modifier = Modifier
+                                .clip(shape = RoundedCornerShape(12.dp))
+                                .clickable {
+                                    navigateToAlert(AlertRoute(
+                                        alertName = alert.name,
+                                        alertState = alert.status,
+                                        alertCategory = alert.category,
+                                        alertDescription = alert.summary ?: ""
+                                    ))
+                                },
                             alertModel = AlertModel(
                                 alert.name,
                                 alert.category,
@@ -154,7 +166,10 @@ fun AlertCard(
                 Box {
                     Column(horizontalAlignment = Alignment.End) {
                         Text(text = alertModel.status, style = MaterialTheme.typography.bodyMedium)
-                        Text(text = alertModel.updatedDate.toDate(), style = MaterialTheme.typography.bodyMedium)
+                        Text(
+                            text = alertModel.updatedDate.toDate(),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
                     }
                 }
             }
@@ -163,7 +178,7 @@ fun AlertCard(
             Text(
                 text = alertModel.summary,
                 style = MaterialTheme.typography.bodySmall,
-                maxLines = 5,
+                maxLines = 3,
                 overflow = TextOverflow.Ellipsis
             )
         }

@@ -77,7 +77,7 @@ class HomeViewModel @Inject constructor(
             is UploadServiceState.Failed -> {
                 _uploadState.update {
                     UploadState.Failed(
-                        reason = uploadServiceState.reason
+                        reason = uploadServiceState.reason ?: ""
                     )
                 }
                 viewModelScope.launch {

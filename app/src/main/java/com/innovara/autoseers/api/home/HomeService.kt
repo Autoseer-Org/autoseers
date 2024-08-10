@@ -9,7 +9,7 @@ import javax.inject.Inject
 
 sealed class UploadServiceState {
     data class Failed(
-        val reason: String
+        val reason: String? = null
     ) : UploadServiceState()
 
     data object Loading : UploadServiceState()
@@ -46,7 +46,7 @@ class HomeServiceImpl @Inject constructor(
         val request = HomeUploadRequest(tokenId = tokenId, image = image)
         val response = homeApi.uploadReport(request).await()
         when {
-            response.failure != "" -> emit(UploadServiceState.Failed(
+            response.failure.isNullOrBlank().not() -> emit(UploadServiceState.Failed(
                 "Could not process your image due to ${response.failure}"
             ))
             else -> emit(UploadServiceState.Success)

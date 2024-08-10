@@ -110,6 +110,10 @@ dependencies {
 
     //Lottie files
     implementation(libs.lottie.compose)
+
+    //Places API
+    implementation(libs.kotlin.bom)
+    implementation(libs.places)
 }
 
 // Allow references to generated code
