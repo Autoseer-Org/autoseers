@@ -16,6 +16,7 @@ sealed class RecallsServiceState {
         val recalls: List<RecallItem>?
     ): RecallsServiceState()
     data object Loading: RecallsServiceState()
+    data object Empty: RecallsServiceState()
     data object NavigateToManualEntry: RecallsServiceState()
 }
 
@@ -49,6 +50,7 @@ class RecallsServiceImpl @Inject constructor(
                     ))
                 }
             }
+            response.count == 0 -> emit(RecallsServiceState.Empty)
             else -> emit(RecallsServiceState.Loaded(count = response.count, recalls = response.recalls))
         }
     }.catch {
