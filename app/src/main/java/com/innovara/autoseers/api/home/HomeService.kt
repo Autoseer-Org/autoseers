@@ -1,10 +1,12 @@
 package com.innovara.autoseers.api.home
 
+import androidx.compose.ui.text.capitalize
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import retrofit2.Retrofit
 import retrofit2.await
+import java.util.Locale
 import javax.inject.Inject
 
 sealed class UploadServiceState {
@@ -71,7 +73,7 @@ class HomeServiceImpl @Inject constructor(
     private fun HomeData.toHomeServiceLoadedState() = HomeServiceState.Loaded(
         mileage = mileage ?: 0,
         alerts = alerts,
-        carModelMake = "$make $model",
+        carModelMake = "${make?.lowercase(Locale.ROOT)?.capitalize(Locale.ROOT)} ${model?.capitalize(Locale.ROOT)}",
         health = healthScore,
         repairs = repairs,
         uploads = reports

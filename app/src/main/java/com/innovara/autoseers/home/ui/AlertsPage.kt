@@ -98,19 +98,25 @@ fun AlertsPage(
                         )
                         Spacer(modifier = Modifier.height(24.dp))
                     }
-                    items(listState) { alert ->
+                    items(listState, key = { alert ->
+                        alert.id
+                    }) { alert ->
                         AlertCard(
                             modifier = Modifier
                                 .clip(shape = RoundedCornerShape(12.dp))
                                 .clickable {
-                                    navigateToAlert(AlertRoute(
-                                        alertName = alert.name,
-                                        alertState = alert.status,
-                                        alertCategory = alert.category,
-                                        alertDescription = alert.summary ?: ""
-                                    ))
+                                    navigateToAlert(
+                                        AlertRoute(
+                                            alertName = alert.name,
+                                            alertState = alert.status,
+                                            alertCategory = alert.category,
+                                            alertDescription = alert.summary ?: "",
+                                            alertId = alert.id
+                                        )
+                                    )
                                 },
                             alertModel = AlertModel(
+                                alert.id,
                                 alert.name,
                                 alert.category,
                                 alert.updatedDate,
@@ -189,6 +195,7 @@ fun AlertCard(
 @Preview
 fun PreviewAlertCard(
     alertModel: AlertModel = AlertModel(
+        "",
         "Something",
         "Interior",
         "10/30/202",

@@ -107,7 +107,7 @@ fun LoadedHomeUi(
             modifier = modifier
                 .fillMaxSize()
                 .verticalScroll(scrollableState)
-                .padding(26.dp)
+                .padding(18.dp)
                 .padding(bottom = 10.dp),
             verticalArrangement = Arrangement.spacedBy(18.dp)
         ) {
@@ -147,12 +147,12 @@ fun LoadedHomeUi(
                 uploads = homeModel.uploadedReports
             )
             Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = "Things to keep in mind",
-                modifier = Modifier.padding(vertical = 12.dp),
-                style = MaterialTheme.typography.bodyLarge
-            )
             if (homeModel.alerts > 0) {
+                Text(
+                    text = "Things to keep in mind",
+                    modifier = Modifier.padding(vertical = 12.dp),
+                    style = MaterialTheme.typography.bodyLarge
+                )
                 HomeCard(
                     modifier = Modifier.clickable {
                         navigateToAlerts()

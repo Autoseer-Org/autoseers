@@ -1,5 +1,6 @@
 package com.innovara.autoseers.api.home
 
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -23,16 +24,24 @@ sealed class BookAppointmentState {
     data object Failed : BookAppointmentState()
 }
 
-sealed class MarkAsRepairState {
-    data object Loading: MarkAsRepairState()
-    data object Repaired: MarkAsRepairState()
-    data object Failed: MarkAsRepairState()
+sealed class MarkAsRepairServiceState {
+    data object Loading : MarkAsRepairServiceState()
+    data object Repaired : MarkAsRepairServiceState()
+    data object Failed : MarkAsRepairServiceState()
+}
+
+sealed class PollBookingStatusServiceState {
+    data object Failure : PollBookingStatusServiceState()
+    data class Loaded(
+        val state: BookingState,
+    ) : PollBookingStatusServiceState()
 }
 
 interface AlertsService {
     suspend fun getAlerts(token: String): Flow<AlertsServiceState>
     suspend fun bookAppointment(appointmentBookingRequest: AppointmentBookingRequest): Flow<BookAppointmentState>
-    suspend fun markAsRepaired(markAsRepairRequest: MarkAsRepairRequest): Flow<MarkAsRepairState>
+    suspend fun markAsRepaired(markAsRepairRequest: MarkAsRepairedRequest): Flow<MarkAsRepairServiceState>
+    suspend fun pollBookingStatus(pollBookingStatusRequest: PollBookingStatusRequest): Flow<PollBookingStatusServiceState>
 }
 
 class AlertsServiceImpl @Inject constructor(
@@ -64,7 +73,28 @@ class AlertsServiceImpl @Inject constructor(
             emit(BookAppointmentState.Failed)
         }
 
-    override suspend fun markAsRepaired(markAsRepairRequest: MarkAsRepairRequest): Flow<MarkAsRepairState> = flow {
-        emit(MarkAsRepairState.Loading)
-    }
+    override suspend fun markAsRepaired(markAsRepairRequest: MarkAsRepairedRequest): Flow<MarkAsRepairServiceState> =
+        flow {
+            emit(MarkAsRepairServiceState.Loading)
+            val response = api.markAsRepaired(markAsRepairRequest).await()
+            when {
+                response.failure == null -> emit(MarkAsRepairServiceState.Repaired)
+                else -> emit(MarkAsRepairServiceState.Failed)
+            }
+        }.catch {
+            emit(MarkAsRepairServiceState.Failed)
+        }
+
+    override suspend fun pollBookingStatus(pollBookingStatusRequest: PollBookingStatusRequest): Flow<PollBookingStatusServiceState> =
+        flow {
+            while (true) {
+                // Polling every 8s
+                val response = api.pollBookingStatus(pollBookingStatusRequest).await()
+                when {
+                    response.failure != null -> emit(PollBookingStatusServiceState.Failure)
+                    else -> emit(PollBookingStatusServiceState.Loaded(state = response.state))
+                }
+                delay(4000L)
+            }
+        }
 }
