@@ -6,6 +6,8 @@ import com.innovara.autoseers.api.home.HomeService
 import com.innovara.autoseers.api.home.HomeServiceImpl
 import com.innovara.autoseers.api.onboarding.OnboardingService
 import com.innovara.autoseers.api.onboarding.OnboardingServiceImpl
+import com.innovara.autoseers.api.recommendations.RecommendationsService
+import com.innovara.autoseers.api.recommendations.RecommendationsServiceImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,4 +32,9 @@ object ApiModule {
     fun provideAlertService(
         retrofit: Retrofit,
     ): AlertsService = AlertsServiceImpl(retrofit)
+
+    @Provides
+    fun provideRecommendationsService(
+        retrofit: Retrofit,
+    ): RecommendationsService = RecommendationsServiceImpl(retrofit)
 }

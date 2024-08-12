@@ -29,6 +29,7 @@ data class AlertRoute(
     val alertDescription: String = "",
     val alertCategory: String = "",
     val alertState: String = "",
+    val alertId: String = ""
 ) : GlobalRoute()
 
 fun NavGraphBuilder.buildHomeScreen(
@@ -63,12 +64,19 @@ fun NavGraphBuilder.buildAlertPage(
 ) = composable<AlertRoute> {
     if (authState is AuthState.UserAuthenticated) {
         val alertsViewModel: AlertsViewModel = hiltViewModel()
+        val bookingState by alertsViewModel.bookingState.collectAsState()
+        val markAsRepairedState by alertsViewModel.repairedState.collectAsState()
+        val pollingBookingStatusState by alertsViewModel.pollingBookingStatusState.collectAsState()
         AlertPage(
             alertArgument = it.toRoute(),
             navigateBack = onBackPress,
             markAsRepaired = alertsViewModel::markAsRepair,
             onBookAppointment = alertsViewModel::bookAppointment,
-            authToken = authState.authAuthenticatedModel.tokenId
+            authToken = authState.authAuthenticatedModel.tokenId,
+            bookingState = bookingState,
+            markAsRepairedState = markAsRepairedState,
+            pollingBookingStatusState = pollingBookingStatusState,
+            startPollingForBookingStatus = alertsViewModel::pollBookingStatus
         )
     }
 }

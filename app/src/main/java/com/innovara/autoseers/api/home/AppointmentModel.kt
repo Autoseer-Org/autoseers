@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class AppointmentBookingRequest(
     val token: String,
+    val id: String,
     val place: String,
     val timeDate: String,
     val email: String,
@@ -13,15 +14,4 @@ data class AppointmentBookingRequest(
 @Serializable
 data class AppointmentBookingResponse(
     val failure: String?,
-)
-
-@Serializable
-data class MarkAsRepairRequest(
-    val token: String,
-    val partName: String,
-)
-
-@Serializable
-data class MarkAsRepairResponse(
-    val failure: String?
 )
