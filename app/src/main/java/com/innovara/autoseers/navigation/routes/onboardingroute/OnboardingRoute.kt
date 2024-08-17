@@ -27,11 +27,16 @@ object NamePromptRoute
 
 fun NavGraphBuilder.buildOnboardingScreen(
     navigateToPhoneAuthentication: () -> Unit = {},
+    authState: AuthState,
 ) {
     composable<OnboardingRoute> {
-        InitialScreen(
-            onStartPressed = navigateToPhoneAuthentication
-        )
+        if (authState is AuthState.NotAuthenticated) {
+            InitialScreen(
+                onStartPressed = navigateToPhoneAuthentication
+            )
+        }else {
+            Unit
+        }
     }
 }
 

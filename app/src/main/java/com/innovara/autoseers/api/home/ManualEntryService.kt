@@ -45,7 +45,7 @@ class ManualEntryServiceImpl @Inject constructor(
             else -> emit(ManualEntryServiceState.Successful)
         }
     }.catch {
-        emit(ManualEntryServiceState.Failed(reason = it.localizedMessage))
+        emit(ManualEntryServiceState.Failed(reason = it.localizedMessage ?: ""))
     }
 
 }

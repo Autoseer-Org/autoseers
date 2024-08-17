@@ -2,6 +2,8 @@ package com.innovara.autoseers
 
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.view.ViewTreeObserver
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -10,12 +12,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.core.view.WindowCompat
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.compose.AutoSeersTheme
 import com.innovara.autoseers.di.firebase.FirebaseService
 import com.innovara.autoseers.navigation.NavigationAppManager
-import com.innovara.autoseers.onboarding.logic.OnboardingViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -27,25 +27,34 @@ class MainActivity : ComponentActivity() {
 
     private val authViewModel: AuthViewModel by viewModels()
 
+    private var isReady = false
     override fun onStart() {
         super.onStart()
         val auth = firebaseService.auth
         when (auth.currentUser) {
             null -> {
                 // User is not sign in. Take them to the onboarding page
-
+                // Reset the auth state to Not authenticated and show first frame
+                authViewModel.resetAuthState(
+                    authState = AuthState.NotAuthenticated
+                )
+                isReady = true
             }
 
             else -> {
                 // User is signed in. Take them to the home page
                 auth.currentUser?.getIdToken(false)
                     ?.addOnFailureListener {
+                        isReady = true
+                        authViewModel.resetAuthState(
+                            authState = AuthState.NotAuthenticated
+                        )
                         Log.e("TASK", it.localizedMessage ?: "")
                     }
                     ?.addOnCompleteListener {
-                         if (it.exception != null) {
+                        if (it.exception != null) {
                             return@addOnCompleteListener
-                        }else {
+                        } else {
                             authViewModel.resetAuthState(
                                 authState = AuthState.UserAuthenticated(
                                     authAuthenticatedModel = AuthAuthenticatedModel(
@@ -55,8 +64,9 @@ class MainActivity : ComponentActivity() {
                                     shouldSkipNameStep = true
                                 )
                             )
+                            isReady = true
                         }
-                }
+                    }
             }
         }
 
@@ -64,6 +74,21 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        installSplashScreen()
+
+        val content: View = findViewById(android.R.id.content)
+        content.viewTreeObserver.addOnPreDrawListener(
+            object : ViewTreeObserver.OnPreDrawListener {
+                override fun onPreDraw(): Boolean {
+                    return if (isReady) {
+                        content.viewTreeObserver.removeOnPreDrawListener(this)
+                        true
+                    } else {
+                        false
+                    }
+                }
+            }
+        )
         setContent {
             AutoSeersTheme {
                 Surface(

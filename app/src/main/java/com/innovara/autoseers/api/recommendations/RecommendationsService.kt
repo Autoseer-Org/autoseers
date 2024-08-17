@@ -1,6 +1,7 @@
 package com.innovara.autoseers.api.recommendations
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import retrofit2.Retrofit
 import retrofit2.await
@@ -37,6 +38,7 @@ class RecommendationsServiceImpl @Inject constructor(
                     )
                 )
             }
+        }.catch {
+            emit(RecommendationServiceServiceState.Failure)
         }
-
 }

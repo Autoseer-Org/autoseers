@@ -20,14 +20,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.innovara.autoseers.AuthState
@@ -50,16 +48,16 @@ fun RecommendedServicesScreen(
                 title = {
                     Text(
                         text = "Services",
-                        style = MaterialTheme.typography.displayMedium
+                        style = MaterialTheme.typography.displaySmall
                     )
                 },
             )
         }
     ) {
-        when (val uiState = state) {
+        when (state) {
             is RecommendationsState.Loading -> LoadingIndicator()
             is RecommendationsState.Loaded -> {
-                val listState = remember { uiState.recommendations.toMutableStateList() }
+                val listState = remember { state.recommendations.toMutableStateList() }
                 LazyColumn(
                     modifier = Modifier
                         .padding(it)
@@ -72,15 +70,14 @@ fun RecommendedServicesScreen(
                         )
                         Spacer(modifier = Modifier.height(18.dp))
                     }
-                    items(listState, key = {
-                        it.serviceName
-                    }) {
+                    items(listState, key = { recommendation ->
+                        recommendation.serviceName
+                    }) { recommendation ->
                         ServiceCard(
-                            serviceName = it.serviceName,
-                            servicePrice = it.averagePrice,
-                            description = it.description
+                            serviceName = recommendation.serviceName,
+                            servicePrice = recommendation.averagePrice,
                         )
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(18.dp))
                     }
                 }
             }
@@ -99,7 +96,6 @@ fun RecommendedServicesScreen(
 fun ServiceCard(
     serviceName: String,
     servicePrice: String,
-    description: String,
 ) {
     Column(
         modifier = Modifier
@@ -114,8 +110,11 @@ fun ServiceCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
-                Text(text = serviceName, style = MaterialTheme.typography.displaySmall)
-                Text(text = "$servicePrice Average price", style = MaterialTheme.typography.bodyMedium)
+                Text(text = serviceName, style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    text = "$servicePrice Average price",
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
             Image(
                 modifier = Modifier.size(44.dp),
@@ -123,6 +122,5 @@ fun ServiceCard(
                 contentDescription = ""
             )
         }
-        Text(text = description, style = MaterialTheme.typography.bodySmall)
     }
 }

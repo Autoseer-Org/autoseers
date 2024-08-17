@@ -26,7 +26,7 @@ sealed class RecommendationsState {
 @HiltViewModel
 class RecommendationsViewModel @Inject constructor(
     private val recommendationsService: RecommendationsService,
-): ViewModel() {
+) : ViewModel() {
     private val _state: MutableStateFlow<RecommendationsState> =
         MutableStateFlow(RecommendationsState.Idle)
     val state: StateFlow<RecommendationsState> = _state.asStateFlow()

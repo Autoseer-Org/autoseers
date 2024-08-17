@@ -29,6 +29,7 @@ data class AuthAuthenticatedModel(
 )
 
 sealed class AuthState {
+    data object Loading: AuthState()
     data object NotAuthenticated : AuthState()
     data class PhoneVerificationInProgress(
         val authInProgressModel: AuthInProgressModel,
@@ -49,7 +50,7 @@ class AuthViewModel @Inject constructor() : ViewModel() {
     private var currentVerificationStatus: VerificationStatus = VerificationStatus.UNKNOWN
 
     private val _authState: MutableStateFlow<AuthState> =
-        MutableStateFlow(AuthState.NotAuthenticated)
+        MutableStateFlow(AuthState.Loading)
     val authState: StateFlow<AuthState> = _authState
 
 

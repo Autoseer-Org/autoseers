@@ -14,8 +14,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -154,7 +157,6 @@ fun HomeScreen(
 
 @Composable
 fun EmptyHomeUi(modifier: Modifier = Modifier, uploadState: UploadState) {
-    val composition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.raw.animation2))
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
@@ -165,6 +167,7 @@ fun EmptyHomeUi(modifier: Modifier = Modifier, uploadState: UploadState) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if (uploadState is UploadState.Uploading) {
+                val composition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.raw.animation2))
                 LottieAnimation(
                     modifier = Modifier.size(200.dp),
                     composition = composition,
@@ -172,10 +175,18 @@ fun EmptyHomeUi(modifier: Modifier = Modifier, uploadState: UploadState) {
                 )
                 AnimatedText()
             } else {
-                Image(
-                    modifier = Modifier.size(260.dp),
-                    contentScale = ContentScale.FillWidth,
-                    painter = painterResource(id = R.drawable.modern_car), contentDescription = ""
+                val emptyStateComposition by rememberLottieComposition(
+                    spec = LottieCompositionSpec.RawRes(
+                        R.raw.empty_state_lottie
+                    )
+                )
+                LottieAnimation(
+                    composition = emptyStateComposition,
+                    modifier = Modifier
+                        .requiredSize(200.dp),
+                    safeMode = true,
+                    contentScale = ContentScale.Crop,
+                    iterations = LottieConstants.IterateForever
                 )
                 Text(
                     text = "You can upload your multi-checkpoint\n" +

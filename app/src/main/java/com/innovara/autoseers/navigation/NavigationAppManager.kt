@@ -2,10 +2,6 @@ package com.innovara.autoseers.navigation
 
 import android.util.Log
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -16,12 +12,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.innovara.autoseers.AuthState
@@ -104,14 +98,26 @@ fun NavigationAppManager(
         bottomBar = {
             if (shouldShowBottomNavBar) {
                 BottomNavBar(
-                    navController = navController, items = listOf(
-                        BottomNavItem(HomeRoute, ImageVector.vectorResource(id = R.drawable.outline_home_24), "Home"),
+                    navController = navController,
+                    items = listOf(
+                        BottomNavItem(
+                            HomeRoute,
+                            ImageVector.vectorResource(id = R.drawable.outline_home_24),
+                            ImageVector.vectorResource(id = R.drawable.baseline_home_24),
+                            "Home",
+                        ),
                         BottomNavItem(
                             RecommendationsRoute,
                             ImageVector.vectorResource(id = R.drawable.outline_bolt_24),
+                            ImageVector.vectorResource(id = R.drawable.baseline_bolt_24),
                             "Services"
                         ),
-                        BottomNavItem(SettingsRoute, ImageVector.vectorResource(id = R.drawable.outline_settings_24), "Settings"),
+                        BottomNavItem(
+                            SettingsRoute,
+                            ImageVector.vectorResource(id = R.drawable.outline_settings_24),
+                            ImageVector.vectorResource(id = R.drawable.baseline_settings_24),
+                            "Settings"
+                        ),
                     )
                 )
             }
@@ -129,9 +135,11 @@ fun NavigationAppManager(
             navController = navController,
             startDestination = if (authState is AuthState.UserAuthenticated && authState.shouldSkipNameStep) AutoSeersExperience else OnboardingRoute
         ) {
-            buildOnboardingScreen(navigateToPhoneAuthentication = {
-                navController.navigateToPhoneAuthentication()
-            })
+            buildOnboardingScreen(
+                authState = authState,
+                navigateToPhoneAuthentication = {
+                    navController.navigateToPhoneAuthentication()
+                })
             buildPhoneAuthenticationScreen(
                 authState = authState,
                 onPhoneNumberEntered = onPhoneNumberEntered,
