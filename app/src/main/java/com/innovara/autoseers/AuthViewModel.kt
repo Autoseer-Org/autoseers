@@ -11,6 +11,7 @@ import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ActivityContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -45,7 +46,8 @@ sealed class AuthState {
 }
 
 @HiltViewModel
-class AuthViewModel @Inject constructor() : ViewModel() {
+class AuthViewModel @Inject constructor(
+) : ViewModel() {
 
     private var currentVerificationStatus: VerificationStatus = VerificationStatus.UNKNOWN
 
@@ -89,7 +91,7 @@ class AuthViewModel @Inject constructor() : ViewModel() {
                                         shouldTransitionToCodeScreen = false
                                     ),
                                     error = true,
-                                    errorMessage = "Verify code is correct",
+                                    errorMessage = "Incorrect code. Please try again.",
                                 )
 
                                 else -> it

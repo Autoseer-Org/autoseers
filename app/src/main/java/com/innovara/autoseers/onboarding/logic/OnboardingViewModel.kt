@@ -1,11 +1,13 @@
 package com.innovara.autoseers.onboarding.logic
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.innovara.autoseers.api.onboarding.OnboardingRequest
 import com.innovara.autoseers.api.onboarding.OnboardingService
 import com.innovara.autoseers.api.onboarding.OnboardingServiceState
 import com.innovara.autoseers.di.analytics.onboardingevents.OnboardingAnalyticsEvents
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ActivityContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest

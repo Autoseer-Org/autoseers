@@ -16,8 +16,16 @@ sealed class RecommendationServiceServiceState {
     data object Failure : RecommendationServiceServiceState()
 }
 
+data class CarInfo(
+    val make: String,
+    val model: String,
+    val year: Int,
+    val mileage: String,
+)
+
 interface RecommendationsService {
     suspend fun getRecommendations(recommendationsRequest: RecommendationsRequest): Flow<RecommendationServiceServiceState>
+    suspend fun sendCarInfo(carInfo: CarInfo, token: String): Flow<Boolean>
 }
 
 class RecommendationsServiceImpl @Inject constructor(
@@ -41,4 +49,22 @@ class RecommendationsServiceImpl @Inject constructor(
         }.catch {
             emit(RecommendationServiceServiceState.Failure)
         }
+
+    override suspend fun sendCarInfo(carInfo: CarInfo, token: String): Flow<Boolean> = flow {
+        val response = api.manualEntryForCarInfo(carInfo.toManualEntryRequest(token)).await()
+        when {
+            response.failure.isNullOrBlank() -> emit(true)
+            else -> emit(false)
+        }
+    }.catch {
+        emit(false)
+    }
+
+    private fun CarInfo.toManualEntryRequest(token: String) = ManualEntryRequest(
+        token = token,
+        make = make,
+        model = model,
+        year = year.toString(),
+        mileage = "16,000"
+    )
 }

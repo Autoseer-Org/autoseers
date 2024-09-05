@@ -146,8 +146,8 @@ fun LoadedHomeUi(
                 repairs = homeModel.repairs,
                 uploads = homeModel.uploadedReports
             )
-            Spacer(modifier = Modifier.height(16.dp))
             if (homeModel.alerts > 0) {
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "Things to keep in mind",
                     modifier = Modifier.padding(vertical = 12.dp),
@@ -161,8 +161,13 @@ fun LoadedHomeUi(
                     description = "Based on your recent reports, we've identified ${homeModel.alerts} issues that need your attention soon."
                 )
             }
-            Spacer(modifier = Modifier.height(4.dp))
             if (homeModel.repairs > 0) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Achievements",
+                    modifier = Modifier.padding(vertical = 12.dp),
+                    style = MaterialTheme.typography.bodyLarge
+                )
                 HomeCard(
                     color = MaterialTheme.colorScheme.tertiary.copy(alpha = .5f),
                     imageRes = R.drawable.check,
