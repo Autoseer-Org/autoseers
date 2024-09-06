@@ -26,6 +26,7 @@ fun NavGraphBuilder.buildRecommendedServices(
             RecommendedServicesScreen(
                 authState = authState,
                 getRecommendations = recommendationsViewModel::getRecommendations,
+                carInfoEntered = recommendationsViewModel::submitManualCarInfo,
                 state = state
             )
         }

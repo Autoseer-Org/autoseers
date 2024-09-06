@@ -27,6 +27,7 @@ fun BottomNavBar(navController: NavController, items: List<BottomNavItem>) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         items.forEach { item ->
             val isItemSelected = navBackStackEntry?.getRouteLastSegmentName() == item.route.toString()
+
             NavigationBarItem(
                 icon = {
                        if (isItemSelected) {

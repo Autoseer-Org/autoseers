@@ -1,5 +1,6 @@
 package com.innovara.autoseers.api.di
 
+import android.content.Context
 import com.innovara.autoseers.api.home.AlertsService
 import com.innovara.autoseers.api.home.AlertsServiceImpl
 import com.innovara.autoseers.api.home.HomeService
@@ -12,6 +13,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.android.qualifiers.ActivityContext
 import retrofit2.Retrofit
 
 @Module
@@ -19,7 +21,7 @@ import retrofit2.Retrofit
 object ApiModule {
     @Provides
     fun provideOnboardingService(
-        retrofit: Retrofit
+        retrofit: Retrofit,
     ): OnboardingService =
         OnboardingServiceImpl(retrofit)
 
