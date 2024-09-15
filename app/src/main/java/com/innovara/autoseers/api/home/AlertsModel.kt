@@ -3,11 +3,6 @@ package com.innovara.autoseers.api.home
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class AlertsRequest(
-    val token: String
-)
-
-@Serializable
 data class AlertsResponse(
     val data: List<Alert>? = null
 )

@@ -5,7 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ManualEntryRequest(
-    val token: String,
     val year: String,
     val make: String,
     val model: String,
@@ -15,11 +14,6 @@ data class ManualEntryRequest(
 @Serializable
 data class ManualEntryResponse(
     val failure: String? = null,
-)
-
-@Serializable
-data class RecommendationsRequest(
-    val token: String,
 )
 
 @Serializable

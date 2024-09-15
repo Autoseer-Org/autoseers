@@ -23,8 +23,10 @@ data class HomeData(
     val mileage: Int? = 0,
     @SerialName("health_score")
     val healthScore: Int,
-    @SerialName("alert")
+    @SerialName("alerts")
     val alerts: Int,
+    @SerialName("recalls")
+    val recalls: Int? = 0,
     @SerialName("repairs")
     val repairs: Int,
     @SerialName("reports")
@@ -37,8 +39,6 @@ data class HomeData(
 
 @Serializable
 data class HomeUploadRequest(
-    @SerialName("token")
-    val tokenId: String,
     @SerialName("image")
     val image: ByteArray
 ) {
@@ -47,17 +47,11 @@ data class HomeUploadRequest(
         if (javaClass != other?.javaClass) return false
 
         other as HomeUploadRequest
-
-        if (tokenId != other.tokenId) return false
-        if (!image.contentEquals(other.image)) return false
-
-        return true
+        return image.contentEquals(other.image)
     }
 
     override fun hashCode(): Int {
-        var result = tokenId.hashCode()
-        result = 31 * result + image.contentHashCode()
-        return result
+        return image.contentHashCode()
     }
 }
 

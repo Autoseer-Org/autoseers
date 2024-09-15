@@ -39,9 +39,9 @@ sealed class PollBookingStatusServiceState {
 
 interface AlertsService {
     suspend fun getAlerts(token: String): Flow<AlertsServiceState>
-    suspend fun bookAppointment(appointmentBookingRequest: AppointmentBookingRequest): Flow<BookAppointmentState>
-    suspend fun markAsRepaired(markAsRepairRequest: MarkAsRepairedRequest): Flow<MarkAsRepairServiceState>
-    suspend fun pollBookingStatus(pollBookingStatusRequest: PollBookingStatusRequest): Flow<PollBookingStatusServiceState>
+    suspend fun bookAppointment(token: String, appointmentBookingRequest: AppointmentBookingRequest): Flow<BookAppointmentState>
+    suspend fun markAsRepaired(token: String, markAsRepairRequest: MarkAsRepairedRequest): Flow<MarkAsRepairServiceState>
+    suspend fun pollBookingStatus(token: String, pollBookingStatusRequest: PollBookingStatusRequest): Flow<PollBookingStatusServiceState>
 }
 
 class AlertsServiceImpl @Inject constructor(
@@ -50,7 +50,7 @@ class AlertsServiceImpl @Inject constructor(
     private val api = retrofit.create(AlertsApi::class.java)
     override suspend fun getAlerts(token: String): Flow<AlertsServiceState> = flow {
         emit(AlertsServiceState.Loading)
-        val response = api.fetchAlerts(AlertsRequest(token)).await()
+        val response = api.fetchAlerts(authHeader = token).await()
         when {
             response.data == null -> emit(AlertsServiceState.Failed)
             response.data.isEmpty() -> emit(AlertsServiceState.Loaded(emptyList()))
@@ -61,10 +61,10 @@ class AlertsServiceImpl @Inject constructor(
         emit(AlertsServiceState.Failed)
     }
 
-    override suspend fun bookAppointment(appointmentBookingRequest: AppointmentBookingRequest): Flow<BookAppointmentState> =
+    override suspend fun bookAppointment(token: String, appointmentBookingRequest: AppointmentBookingRequest): Flow<BookAppointmentState> =
         flow {
             emit(BookAppointmentState.Loading)
-            val response = api.bookAppointment(appointmentBookingRequest).await()
+            val response = api.bookAppointment(authHeader = token, appointmentBookingRequest = appointmentBookingRequest).await()
             when {
                 response.failure == null -> emit(BookAppointmentState.AppointmentProcessed)
                 else -> emit(BookAppointmentState.Failed)
@@ -73,10 +73,10 @@ class AlertsServiceImpl @Inject constructor(
             emit(BookAppointmentState.Failed)
         }
 
-    override suspend fun markAsRepaired(markAsRepairRequest: MarkAsRepairedRequest): Flow<MarkAsRepairServiceState> =
+    override suspend fun markAsRepaired(token: String, markAsRepairRequest: MarkAsRepairedRequest): Flow<MarkAsRepairServiceState> =
         flow {
             emit(MarkAsRepairServiceState.Loading)
-            val response = api.markAsRepaired(markAsRepairRequest).await()
+            val response = api.markAsRepaired(authHeader = token, markAsRepairRequest).await()
             when {
                 response.failure == null -> emit(MarkAsRepairServiceState.Repaired)
                 else -> emit(MarkAsRepairServiceState.Failed)
@@ -85,11 +85,11 @@ class AlertsServiceImpl @Inject constructor(
             emit(MarkAsRepairServiceState.Failed)
         }
 
-    override suspend fun pollBookingStatus(pollBookingStatusRequest: PollBookingStatusRequest): Flow<PollBookingStatusServiceState> =
+    override suspend fun pollBookingStatus(token: String, pollBookingStatusRequest: PollBookingStatusRequest): Flow<PollBookingStatusServiceState> =
         flow {
             while (true) {
                 // Polling every 8s
-                val response = api.pollBookingStatus(pollBookingStatusRequest).await()
+                val response = api.pollBookingStatus(authHeader = token, pollBookingStatusRequest = pollBookingStatusRequest).await()
                 when {
                     response.failure != null -> emit(PollBookingStatusServiceState.Failure)
                     else -> emit(PollBookingStatusServiceState.Loaded(state = response.state))

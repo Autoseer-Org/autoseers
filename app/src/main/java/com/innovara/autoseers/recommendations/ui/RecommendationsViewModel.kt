@@ -5,10 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.innovara.autoseers.api.recommendations.CarInfo
 import com.innovara.autoseers.api.recommendations.Recommendation
 import com.innovara.autoseers.api.recommendations.RecommendationServiceServiceState
-import com.innovara.autoseers.api.recommendations.RecommendationsRequest
 import com.innovara.autoseers.api.recommendations.RecommendationsService
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -44,7 +42,7 @@ class RecommendationsViewModel @Inject constructor(
 
     suspend fun getRecommendations(token: String) {
         viewModelScope.launch {
-            recommendationsService.getRecommendations(RecommendationsRequest(token))
+            recommendationsService.getRecommendations(tokenId = token)
                 .collectLatest { recommendations ->
                     when (recommendations) {
                         is RecommendationServiceServiceState.Loaded -> _state.update {
