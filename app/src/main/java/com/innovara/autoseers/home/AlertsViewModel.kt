@@ -29,7 +29,6 @@ sealed class AlertsState {
 }
 
 data class CreateServiceBookingModel(
-    val token: String,
     val partName: String,
     val email: String,
     val place: String,
@@ -45,7 +44,6 @@ sealed class BookingState {
 }
 
 data class MarkAsRepairModel(
-    val token: String,
     val partId: String
 )
 
@@ -97,9 +95,10 @@ class AlertsViewModel @Inject constructor(
             }
         }
 
-    suspend fun bookAppointment(createServiceBookingModel: CreateServiceBookingModel) {
+    suspend fun bookAppointment(token: String, createServiceBookingModel: CreateServiceBookingModel) {
         alertsService.bookAppointment(
-            createServiceBookingModel.toAppointmentBookingRequest()
+            token = token,
+            appointmentBookingRequest = createServiceBookingModel.toAppointmentBookingRequest()
         ).collectLatest {
             when (it) {
                 is BookAppointmentState.Loading -> _bookingState.update {
@@ -117,8 +116,11 @@ class AlertsViewModel @Inject constructor(
         }
     }
 
-    suspend fun markAsRepair(markAsRepairModel: MarkAsRepairModel) {
-        alertsService.markAsRepaired(markAsRepairModel.toMarkAsRepairRequest()).collectLatest {
+    suspend fun markAsRepair(token: String, markAsRepairModel: MarkAsRepairModel) {
+        alertsService.markAsRepaired(
+            token = token,
+            markAsRepairRequest = markAsRepairModel.toMarkAsRepairRequest()
+        ).collectLatest {
             when (it) {
                 is MarkAsRepairServiceState.Loading -> _repairedState.update { MarkAsRepairedState.Loading }
                 is MarkAsRepairServiceState.Failed -> _repairedState.update { MarkAsRepairedState.Failed }
@@ -128,7 +130,10 @@ class AlertsViewModel @Inject constructor(
     }
 
     suspend fun pollBookingStatus(token: String, partId: String) {
-        alertsService.pollBookingStatus(PollBookingStatusRequest(token = token, partId = partId))
+        alertsService.pollBookingStatus(
+            token = token,
+            pollBookingStatusRequest = PollBookingStatusRequest(partId = partId)
+        )
             .collect {
                 when (it) {
                     is PollBookingStatusServiceState.Loaded -> {
@@ -155,11 +160,9 @@ class AlertsViewModel @Inject constructor(
 
     private fun MarkAsRepairModel.toMarkAsRepairRequest() = MarkAsRepairedRequest(
         partId = partId,
-        token = token,
     )
 
     private fun CreateServiceBookingModel.toAppointmentBookingRequest() = AppointmentBookingRequest(
-        token = this.token,
         email = this.email,
         place = this.place,
         timeDate = this.time,

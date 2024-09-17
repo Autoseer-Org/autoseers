@@ -24,18 +24,18 @@ data class CarInfo(
 )
 
 interface RecommendationsService {
-    suspend fun getRecommendations(recommendationsRequest: RecommendationsRequest): Flow<RecommendationServiceServiceState>
+    suspend fun getRecommendations(tokenId: String): Flow<RecommendationServiceServiceState>
     suspend fun sendCarInfo(carInfo: CarInfo, token: String): Flow<Boolean>
 }
 
 class RecommendationsServiceImpl @Inject constructor(
-    retrofit: Retrofit,
+    retrofit: Retrofit
 ) : RecommendationsService {
     private val api = retrofit.create(RecommendationsApi::class.java)
-    override suspend fun getRecommendations(recommendationsRequest: RecommendationsRequest): Flow<RecommendationServiceServiceState> =
+    override suspend fun getRecommendations(tokenId: String): Flow<RecommendationServiceServiceState> =
         flow {
             emit(RecommendationServiceServiceState.Loading)
-            val response = api.fetchRecommendations(recommendationsRequest).await()
+            val response = api.fetchRecommendations(tokenId).await()
             when {
                 response.error.isNullOrBlank()
                     .not() -> emit(RecommendationServiceServiceState.Failure)
@@ -51,7 +51,10 @@ class RecommendationsServiceImpl @Inject constructor(
         }
 
     override suspend fun sendCarInfo(carInfo: CarInfo, token: String): Flow<Boolean> = flow {
-        val response = api.manualEntryForCarInfo(carInfo.toManualEntryRequest(token)).await()
+        val response = api.manualEntryForCarInfo(
+            authHeader = token,
+            manualEntryRequest = carInfo.toManualEntryRequest(token)
+        ).await()
         when {
             response.failure.isNullOrBlank() -> emit(true)
             else -> emit(false)
@@ -61,7 +64,6 @@ class RecommendationsServiceImpl @Inject constructor(
     }
 
     private fun CarInfo.toManualEntryRequest(token: String) = ManualEntryRequest(
-        token = token,
         make = make,
         model = model,
         year = year.toString(),

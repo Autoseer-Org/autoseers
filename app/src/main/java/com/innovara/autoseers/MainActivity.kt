@@ -55,12 +55,11 @@ class MainActivity : ComponentActivity() {
                         if (it.exception != null) {
                             return@addOnCompleteListener
                         } else {
+                            val authAuthenticatedModel = AuthAuthenticatedModel(context = this)
+                            authAuthenticatedModel.storeNewToken(tokenId = it.result.token ?: "")
                             authViewModel.resetAuthState(
                                 authState = AuthState.UserAuthenticated(
-                                    authAuthenticatedModel = AuthAuthenticatedModel(
-                                        tokenId = it.result.token ?: "",
-                                        userName = auth.currentUser?.displayName ?: ""
-                                    ),
+                                    authAuthenticatedModel = authAuthenticatedModel,
                                     shouldSkipNameStep = true
                                 )
                             )
@@ -124,5 +123,9 @@ class MainActivity : ComponentActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         authViewModel.storeCurrentVerificationStep(outState)
         super.onSaveInstanceState(outState)
+    }
+
+    private fun setupAuthViewModel() {
+        val authViewModel: AuthViewModel = AuthViewModel()
     }
 }

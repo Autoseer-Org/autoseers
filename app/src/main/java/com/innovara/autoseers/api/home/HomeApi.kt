@@ -3,12 +3,13 @@ package com.innovara.autoseers.api.home
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.POST
 
 interface HomeApi {
     @POST("/upload")
-    fun uploadReport(@Body uploadRequest: HomeUploadRequest): Call<HomeUploadResponse>
+    fun uploadReport(@Header("Authorization") authHeader: String, @Body uploadRequest: HomeUploadRequest): Call<HomeUploadResponse>
 
-    @POST("/home")
-    fun fetchHomeData(@Body homeRequest: HomeRequest): Call<HomeResponse>
+    @GET("/home")
+    fun fetchHomeData(@Header("Authorization") authHeader: String): Call<HomeResponse>
 }

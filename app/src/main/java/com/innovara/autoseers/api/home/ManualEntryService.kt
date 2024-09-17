@@ -31,8 +31,7 @@ class ManualEntryServiceImpl @Inject constructor(
         mileage: String,
         ): Flow<ManualEntryServiceState> = flow {
         emit(ManualEntryServiceState.Loading)
-        val response = manualEntryApi.manuallyEnterCarData(ManualEntryRequest(
-            token = tokenId,
+        val response = manualEntryApi.manuallyEnterCarData(authHeader = tokenId, manualEntryRequest = ManualEntryRequest(
             year = year,
             make = make,
             model= model,

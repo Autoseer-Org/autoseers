@@ -2,7 +2,6 @@ package com.innovara.autoseers.home.ui
 
 import android.icu.text.SimpleDateFormat
 import android.icu.util.Calendar
-import android.widget.Space
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -82,9 +81,9 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlertPage(
-    onBookAppointment: suspend (CreateServiceBookingModel) -> Unit = {},
+    onBookAppointment: suspend (String, CreateServiceBookingModel) -> Unit = { token: String, createServiceBookingModel: CreateServiceBookingModel -> },
     navigateBack: () -> Unit = {},
-    markAsRepaired: suspend (MarkAsRepairModel) -> Unit = {},
+    markAsRepaired: suspend (String, MarkAsRepairModel) -> Unit = { token: String, markAsRepairModel: MarkAsRepairModel -> },
     alertArgument: AlertRoute,
     authToken: String,
     bookingState: BookingState,
@@ -215,8 +214,8 @@ fun AlertPage(
             TextButton(onClick = {
                 scope.launch {
                     markAsRepaired(
+                        authToken,
                         MarkAsRepairModel(
-                            token = authToken,
                             partId = alertArgument.alertId
                         )
                     )
@@ -236,7 +235,7 @@ fun BookingBottomSheet(
     tokenId: String = "",
     partId: String = "",
     bookingState: BookingState,
-    bookAppointment: suspend (CreateServiceBookingModel) -> Unit = {},
+    bookAppointment: suspend (String, CreateServiceBookingModel) -> Unit = { token: String, createServiceBookingModel: CreateServiceBookingModel -> },
 ) {
     val recommendedPlaces = remember {
         mutableStateListOf("")
@@ -427,10 +426,10 @@ fun BookingBottomSheet(
                             onClick = {
                                 scope.launch {
                                     bookAppointment(
+                                        tokenId,
                                         CreateServiceBookingModel(
                                             place = place,
                                             email = email,
-                                            token = tokenId,
                                             partName = partName,
                                             time = dateString,
                                             id = partId

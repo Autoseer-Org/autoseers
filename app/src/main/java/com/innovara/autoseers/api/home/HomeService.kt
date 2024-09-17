@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import retrofit2.Retrofit
 import retrofit2.await
+import retrofit2.http.Header
 import java.util.Locale
 import javax.inject.Inject
 
@@ -45,8 +46,8 @@ class HomeServiceImpl @Inject constructor(
         image: ByteArray
     ): Flow<UploadServiceState> = flow {
         emit(UploadServiceState.Loading)
-        val request = HomeUploadRequest(tokenId = tokenId, image = image)
-        val response = homeApi.uploadReport(request).await()
+        val request = HomeUploadRequest(image = image)
+        val response = homeApi.uploadReport(authHeader = tokenId, request).await()
         when {
             response.failure.isNullOrBlank().not() -> emit(UploadServiceState.Failed(
                 "Could not process your image due to ${response.failure}"
@@ -59,8 +60,7 @@ class HomeServiceImpl @Inject constructor(
 
     override suspend fun getHomeData(tokenId: String): Flow<HomeServiceState> = flow {
         emit(HomeServiceState.Loading)
-        val request = HomeRequest(tokenId = tokenId)
-        val response = homeApi.fetchHomeData(homeRequest = request).await()
+        val response = homeApi.fetchHomeData(authHeader = tokenId).await()
         when {
             response.data != null -> emit(response.data.toHomeServiceLoadedState())
             else -> emit(HomeServiceState.Empty)
