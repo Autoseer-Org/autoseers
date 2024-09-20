@@ -51,7 +51,7 @@ fun NavGraphBuilder.buildAlertsPage(
     if (authState is AuthState.UserAuthenticated) {
         val alertsViewModel: AlertsViewModel = hiltViewModel()
         LaunchedEffect(key1 = Unit) {
-            alertsViewModel.getAlerts(authState.authAuthenticatedModel.getToken() ?: "")
+            alertsViewModel.getAlerts(authState.authAuthenticatedModel.getToken())
         }
         val state by alertsViewModel.state.collectAsState()
         AlertsPage(state, onBackPress = onBackPress, navigateToAlert = navigateToAlert)
@@ -72,7 +72,7 @@ fun NavGraphBuilder.buildAlertPage(
             navigateBack = onBackPress,
             markAsRepaired = alertsViewModel::markAsRepair,
             onBookAppointment = alertsViewModel::bookAppointment,
-            authToken = authState.authAuthenticatedModel.getToken() ?: "",
+            authToken = authState.authAuthenticatedModel.getToken(),
             bookingState = bookingState,
             markAsRepairedState = markAsRepairedState,
             pollingBookingStatusState = pollingBookingStatusState,

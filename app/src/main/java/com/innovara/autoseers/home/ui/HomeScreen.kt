@@ -81,7 +81,7 @@ fun HomeScreen(
     }
     val uploadState by homeViewModel.uploadState.collectAsState()
     LaunchedEffect(Unit) {
-        homeViewModel.getHomeData(authState.authAuthenticatedModel.getToken() ?: "")
+        homeViewModel.getHomeData(authState.authAuthenticatedModel.getToken())
     }
 
     LaunchedEffect(key1 = uploadState) {
@@ -92,7 +92,7 @@ fun HomeScreen(
             )
         }
         if (uploadState is UploadState.Success) {
-            homeViewModel.getHomeData(authState.authAuthenticatedModel.getToken() ?: "")
+            homeViewModel.getHomeData(authState.authAuthenticatedModel.getToken())
         }
     }
     val carReportPicker =
@@ -105,7 +105,7 @@ fun HomeScreen(
                     val stream = context.contentResolver.openInputStream(uri)
                     scope.launch {
                         homeViewModel.uploadImageReport(
-                            authState.authAuthenticatedModel.getToken() ?: "",
+                            authState.authAuthenticatedModel.getToken(),
                             stream?.readBytes() ?: ByteArray(0)
                         )
                     }.invokeOnCompletion {

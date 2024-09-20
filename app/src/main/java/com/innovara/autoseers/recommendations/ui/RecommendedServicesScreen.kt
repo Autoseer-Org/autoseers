@@ -68,7 +68,7 @@ fun RecommendedServicesScreen(
     carInfoEntered: suspend (String, CarInfo) -> Unit
 ) {
     LaunchedEffect(key1 = Unit) {
-        val tokenId = authState.authAuthenticatedModel.getToken() ?: ""
+        val tokenId = authState.authAuthenticatedModel.getToken()
         getRecommendations(tokenId)
     }
 
@@ -148,7 +148,7 @@ fun RecommendedServicesScreen(
                             data = carListData,
                         ) {
                             scope.launch {
-                                val tokenId = authState.authAuthenticatedModel.getToken() ?: ""
+                                val tokenId = authState.authAuthenticatedModel.getToken()
                                 carInfoEntered(tokenId, it)
                             }
                         }

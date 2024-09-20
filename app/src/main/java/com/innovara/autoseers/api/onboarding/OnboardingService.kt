@@ -16,16 +16,16 @@ sealed class OnboardingServiceState {
 }
 
 interface OnboardingService {
-    suspend fun sendOnboardingData(onboardingRequest: OnboardingRequest): Flow<OnboardingServiceState>
+    suspend fun sendOnboardingData(token: String, onboardingRequest: OnboardingRequest): Flow<OnboardingServiceState>
 }
 
 class OnboardingServiceImpl @Inject constructor(
     retrofit: Retrofit,
 ) : OnboardingService {
     private val api: OnboardingApi = retrofit.create(OnboardingApi::class.java)
-    override suspend fun sendOnboardingData(onboardingRequest: OnboardingRequest): Flow<OnboardingServiceState> =
+    override suspend fun sendOnboardingData(token: String, onboardingRequest: OnboardingRequest): Flow<OnboardingServiceState> =
         flow {
-            val response = api.sendOnboardingCompletion(onboardingRequest).await()
+            val response = api.sendOnboardingCompletion(authHeader = token, onboardingRequest = onboardingRequest).await()
             when {
                 response.reason.isNullOrBlank() -> emit(
                     OnboardingServiceState.OnboardingSuccess
