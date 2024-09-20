@@ -112,7 +112,7 @@ data class AuthAuthenticatedModel @Inject constructor(
             val encryptedToken = Base64.decode(encryptedTokenString, Base64.DEFAULT)
             val token = decryptToken(encryptedToken)
             println("Decrypted token: $token")
-            return "Bearer ${token}"
+            return "Bearer $token"
         }
         return ""
     }
