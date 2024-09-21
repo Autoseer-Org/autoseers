@@ -16,6 +16,6 @@ interface AlertsApi {
     @POST("/markAsRepaired")
     fun markAsRepaired(@Header("Authorization") authHeader: String, @Body markAsRepairedRequest: MarkAsRepairedRequest): Call<MarkAsRepairedResponse>
 
-    @GET("/pollBookingStatus")
+    @POST("/pollBookingStatus")
     fun pollBookingStatus(@Header("Authorization") authHeader: String, @Body pollBookingStatusRequest: PollBookingStatusRequest): Call<PollBookingStatusResponse>
 }
