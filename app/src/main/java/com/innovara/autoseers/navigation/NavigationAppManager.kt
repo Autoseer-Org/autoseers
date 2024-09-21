@@ -166,7 +166,7 @@ fun NavigationAppManager(
                     }) {
                         if (authState is AuthState.UserAuthenticated) {
                             onboardingViewModel.sendOnboardingData(
-                                tokenId = authState.authAuthenticatedModel.getToken() ?: "",
+                                tokenId = authState.authAuthenticatedModel.getToken(),
                                 username = name
                             )
                         }

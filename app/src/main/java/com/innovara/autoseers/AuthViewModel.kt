@@ -103,7 +103,7 @@ data class AuthAuthenticatedModel @Inject constructor(
         editor.apply()
     }
 
-    fun getToken(): String? {
+    fun getToken(): String {
         val encryptedTokenString = context
             .getSharedPreferences("secure_prefs", Context.MODE_PRIVATE)
             .getString("encrypted_token", null)
@@ -112,9 +112,9 @@ data class AuthAuthenticatedModel @Inject constructor(
             val encryptedToken = Base64.decode(encryptedTokenString, Base64.DEFAULT)
             val token = decryptToken(encryptedToken)
             println("Decrypted token: $token")
-            return token
+            return "Bearer $token"
         }
-        return null
+        return ""
     }
 }
 

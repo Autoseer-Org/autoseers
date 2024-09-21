@@ -7,8 +7,6 @@ import kotlinx.serialization.Serializable
 data class OnboardingRequest(
     @SerialName("name")
     val userName: String,
-    @SerialName("token")
-    val tokenId: String,
 )
 
 @Serializable

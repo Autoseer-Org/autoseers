@@ -51,8 +51,8 @@ class OnboardingViewModel @Inject constructor(
 
     suspend fun sendOnboardingData(tokenId: String, username: String) {
         onboardingService.sendOnboardingData(
+            token = tokenId,
             OnboardingRequest(
-                tokenId = tokenId,
                 userName = username
             )
         ).collectLatest(::updateState)
