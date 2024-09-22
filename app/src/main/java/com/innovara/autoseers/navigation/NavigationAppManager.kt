@@ -4,18 +4,21 @@ import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.innovara.autoseers.AuthState
@@ -43,6 +46,8 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import com.innovara.autoseers.R
 import com.innovara.autoseers.navigation.routes.recommendations.buildRecommendedServices
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.map
 
 /**
  * NavigationAppManager serves as the entry point for creating the nav graph for the app
@@ -93,10 +98,19 @@ fun NavigationAppManager(
             else -> false
         }
     }
-
+    val currentBackStackEntryAsFlow = navController.currentBackStackEntryFlow
+    var isMainRoute by remember {
+        mutableStateOf(false)
+    }
+    LaunchedEffect(key1 = currentBackStackEntryAsFlow) {
+        currentBackStackEntryAsFlow.collect{ backStackEntry ->
+            Log.e("CURRENT ROUTE",backStackEntry.destination.route ?: "")
+            isMainRoute = backStackEntry.isAllowedToSeeBottomNavBar()
+        }
+    }
     Scaffold(
         bottomBar = {
-            if (shouldShowBottomNavBar) {
+            if (shouldShowBottomNavBar && isMainRoute) {
                 BottomNavBar(
                     navController = navController,
                     items = listOf(
