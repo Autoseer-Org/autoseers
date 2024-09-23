@@ -10,6 +10,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -52,6 +53,10 @@ fun CodeAuthenticationScreen(
     val interactionSource = remember { MutableInteractionSource() }
     val snackbarHostState = remember {
         SnackbarHostState()
+    }
+
+    var isLoading by remember {
+        mutableStateOf(false)
     }
 
     LaunchedEffect(key1 = authState) {
@@ -115,15 +120,21 @@ fun CodeAuthenticationScreen(
             )
 
             Button(
+                enabled = !isLoading,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 26.dp),
                 onClick = {
+                    isLoading = true
                     onCodeEntered(code)
                     focusManager.clearFocus(true)
                     onCodeAuthEvents.invoke(OnboardingEvents.CodeEntered)
                 }) {
-                Text(text = stringResource(id = R.string.next_button))
+                if (isLoading) {
+                    CircularProgressIndicator()
+                } else {
+                    Text(text = stringResource(id = R.string.next_button))
+                }
             }
         }
     }
