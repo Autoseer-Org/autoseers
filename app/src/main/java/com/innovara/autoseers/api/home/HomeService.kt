@@ -29,6 +29,7 @@ sealed class HomeServiceState {
         val uploads: Int,
         val health: Int,
         val carModelMake: String = "Unknown",
+        val recalls: Int? = null,
     ) : HomeServiceState()
 }
 
@@ -76,6 +77,7 @@ class HomeServiceImpl @Inject constructor(
         carModelMake = "${make?.lowercase(Locale.ROOT)?.capitalize(Locale.ROOT)} ${model?.capitalize(Locale.ROOT)}",
         health = healthScore,
         repairs = repairs,
-        uploads = reports
+        uploads = reports,
+        recalls = recalls
     )
 }

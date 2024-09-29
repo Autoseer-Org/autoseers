@@ -63,9 +63,9 @@ class RecallsServiceImpl @Inject constructor(
         nhtsaCampaignNumber: String
     ): Flow<CompleteRecallServiceState> = flow {
         emit(CompleteRecallServiceState.Loading)
-        val response = recallsApi.completeRecall(CompleteRecallRequest(
-            token = tokenId,
-            nhtsaCampaignNumber = nhtsaCampaignNumber)
+        val response = recallsApi.completeRecall(
+            authorizationToken = tokenId,
+            completeRecallRequest = CompleteRecallRequest(nhtsaCampaignNumber = nhtsaCampaignNumber)
         ).await()
         when {
             response.failure.isNullOrBlank().not() -> emit(CompleteRecallServiceState.Failed(
