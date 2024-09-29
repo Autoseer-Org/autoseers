@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -18,6 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.innovara.autoseers.R
 import com.innovara.autoseers.onboarding.logic.OnboardingEvents
@@ -45,13 +47,21 @@ fun NamePromptScreen(
             Text(text = stringResource(id = R.string.name_description_screen))
             TextField(
                 modifier = Modifier.fillMaxWidth(),
-                value = username, onValueChange = { newName ->
-                username = newName
-            },
-                singleLine = true,
-                keyboardActions = KeyboardActions(onDone = {
-                    focusManager.clearFocus(true)
-                })
+                value = username,
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Done,
+                    autoCorrectEnabled = false,
+                    showKeyboardOnFocus = true,
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        this.defaultKeyboardAction(imeAction = ImeAction.Done)
+                        focusManager.clearFocus(true)
+                    }
+                ),
+                onValueChange = { newName ->
+                    username = newName
+                }
             )
 
             Button(
