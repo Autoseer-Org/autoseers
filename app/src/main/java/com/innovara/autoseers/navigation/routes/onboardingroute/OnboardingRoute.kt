@@ -3,6 +3,7 @@ package com.innovara.autoseers.navigation.routes.onboardingroute
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import com.innovara.autoseers.AuthState
 import com.innovara.autoseers.navigation.routes.AutoSeersExperience
 import com.innovara.autoseers.navigation.routes.homeroute.HomeRoute
@@ -17,7 +18,9 @@ import kotlinx.serialization.Serializable
 object OnboardingRoute
 
 @Serializable
-object PhoneAuthenticationRoute
+data class PhoneAuthenticationRoute(
+    val isSignUpFlow: Boolean
+)
 
 @Serializable
 object CodeRoute
@@ -26,7 +29,7 @@ object CodeRoute
 object NamePromptRoute
 
 fun NavGraphBuilder.buildOnboardingScreen(
-    navigateToPhoneAuthentication: () -> Unit = {},
+    navigateToPhoneAuthentication: (Boolean) -> Unit = {},
     authState: AuthState,
 ) {
     composable<OnboardingRoute> {
@@ -47,11 +50,13 @@ fun NavGraphBuilder.buildPhoneAuthenticationScreen(
     authState: AuthState,
 ) {
     composable<PhoneAuthenticationRoute> {
+        val phoneRoute = it.toRoute<PhoneAuthenticationRoute>()
         PhoneAuthenticationScreen(
             authState = authState,
             onPhoneNumberEntered = onPhoneNumberEntered,
             onBackPressed = onBackPressed,
-            onPhoneAuthEvents = onPhoneAuthEvents
+            onPhoneAuthEvents = onPhoneAuthEvents,
+            isSignUpFlow = phoneRoute.isSignUpFlow
         )
     }
 }
@@ -83,7 +88,7 @@ fun NavGraphBuilder.buildNamePromptScreen(
 
 
 // Nav Events
-fun NavController.navigateToPhoneAuthentication() = navigate(route = PhoneAuthenticationRoute)
+fun NavController.navigateToPhoneAuthentication(isSignUpFlow: Boolean) = navigate(route = PhoneAuthenticationRoute(isSignUpFlow))
 fun NavController.navigateToAutoSeersExperience() = navigate(route = AutoSeersExperience) {
     try {
         popBackStack(route = HomeRoute, inclusive = false) // Assumes HomeRoute is the root of the nested graph
