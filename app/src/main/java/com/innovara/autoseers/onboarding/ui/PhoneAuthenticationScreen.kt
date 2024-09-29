@@ -33,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.core.text.isDigitsOnly
 import com.innovara.autoseers.AuthState
 import com.innovara.autoseers.R
 import com.innovara.autoseers.onboarding.logic.OnboardingEvents
@@ -96,7 +97,9 @@ fun PhoneAuthenticationScreen(
                     .fillMaxWidth(),
                 value = phoneNumber,
                 onValueChange = {
-                    phoneNumber = it
+                    if (it.isDigitsOnly()) {
+                        phoneNumber = it
+                    }
                 },
                 label = {
                     Text(text = "Phone number")
