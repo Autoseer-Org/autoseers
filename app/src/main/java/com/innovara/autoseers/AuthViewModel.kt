@@ -166,7 +166,8 @@ class AuthViewModel @Inject constructor(
                                 val authenticatedModel = AuthAuthenticatedModel(context = activity)
                                 authenticatedModel.storeNewToken(tokenId = tokenTask.result.token ?: "")
                                 AuthState.UserAuthenticated(
-                                    authAuthenticatedModel = authenticatedModel
+                                    authAuthenticatedModel = authenticatedModel,
+                                    shouldSkipNameStep = (task.result.additionalUserInfo?.isNewUser ?: false).not()
                                 )
                             }
                         }

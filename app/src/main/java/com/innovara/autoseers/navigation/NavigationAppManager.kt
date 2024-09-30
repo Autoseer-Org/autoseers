@@ -151,8 +151,8 @@ fun NavigationAppManager(
         ) {
             buildOnboardingScreen(
                 authState = authState,
-                navigateToPhoneAuthentication = {
-                    navController.navigateToPhoneAuthentication()
+                navigateToPhoneAuthentication = { isSignUpFlow ->
+                    navController.navigateToPhoneAuthentication(isSignUpFlow)
                 })
             buildPhoneAuthenticationScreen(
                 authState = authState,

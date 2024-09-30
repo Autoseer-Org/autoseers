@@ -33,7 +33,7 @@ import com.innovara.autoseers.R
 
 @Composable
 fun InitialScreen(
-    onStartPressed: () -> Unit = {},
+    onStartPressed: (isSignUpFlow: Boolean) -> Unit = {},
 ) {
     val bitmap = ImageBitmap.imageResource(id = R.drawable.car)
     Scaffold(
@@ -63,6 +63,7 @@ fun InitialScreen(
             Spacer(modifier = Modifier.height(deviceHeight.dp.times(.14f)))
             ButtonSection(
                 onStartPressed = onStartPressed,
+                onSigningPressed = onStartPressed
             )
         }
     }
@@ -92,8 +93,8 @@ fun HeaderSection(
 
 @Composable
 fun ButtonSection(
-    onStartPressed: () -> Unit = {},
-    onSigningPressed: () -> Unit = {},
+    onStartPressed: (Boolean) -> Unit = {},
+    onSigningPressed: (Boolean) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -102,7 +103,9 @@ fun ButtonSection(
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         Button(
-            onClick = onStartPressed, modifier = Modifier
+            onClick = {
+                onStartPressed(true)
+            }, modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 74.dp)
         ) {
@@ -111,7 +114,9 @@ fun ButtonSection(
                 style = MaterialTheme.typography.bodySmall
             )
         }
-        TextButton(onClick = onSigningPressed) {
+        TextButton(onClick = {
+            onSigningPressed(false)
+        }) {
             Text(
                 text = stringResource(id = R.string.start_with_signin),
                 style = MaterialTheme.typography.bodySmall
