@@ -47,6 +47,7 @@ fun PhoneAuthenticationScreen(
     onBackPressed: () -> Unit,
     onPhoneAuthEvents: (OnboardingEvents) -> Unit,
     authState: AuthState,
+    isSignUpFlow: Boolean,
 ) {
     var phoneNumber by remember {
         mutableStateOf("")
@@ -66,6 +67,7 @@ fun PhoneAuthenticationScreen(
                     }
                 }
             }
+
             else -> Unit
         }
     }
@@ -88,8 +90,11 @@ fun PhoneAuthenticationScreen(
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(text = "Sign up", style = MaterialTheme.typography.headlineLarge)
-            Text(text = stringResource(id = R.string.sign_up_long_message))
+            Text(text = stringResource(id = R.string.sign_up_flow_title.takeIf { isSignUpFlow }
+                ?: R.string.sign_in_flow_title), style = MaterialTheme.typography.headlineLarge)
+
+            Text(text = stringResource(id = R.string.sign_up_long_message.takeIf { isSignUpFlow }
+                ?: R.string.sign_in_long_message))
 
             TextField(
                 modifier = Modifier
