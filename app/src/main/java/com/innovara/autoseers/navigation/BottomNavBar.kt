@@ -2,12 +2,14 @@ package com.innovara.autoseers.navigation
 
 import androidx.compose.material3.Icon
 import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -36,7 +38,7 @@ fun BottomNavBar(navController: NavController, items: List<BottomNavItem>) {
                            Icon(item.icon, contentDescription = item.label)
                        }
                 },
-                label = { Text(item.label) },
+                label = { Text(item.label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurface) },
                 selected = isItemSelected,
                 onClick = {
                     navController.navigate(item.route) {
