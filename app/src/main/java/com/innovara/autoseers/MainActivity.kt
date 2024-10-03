@@ -1,5 +1,6 @@
 package com.innovara.autoseers
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -7,16 +8,25 @@ import android.view.ViewTreeObserver
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import com.example.compose.AutoSeersTheme
 import com.innovara.autoseers.di.firebase.FirebaseService
 import com.innovara.autoseers.navigation.NavigationAppManager
+import com.innovara.autoseers.settings.ui.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -89,7 +99,12 @@ class MainActivity : ComponentActivity() {
             }
         )
         setContent {
-            AutoSeersTheme {
+            val isDarkTheme by applicationContext.dataStore.data
+                .map { preferences ->
+                    preferences[SettingsViewModel.PreferencesKeys.IS_DARK_THEME] ?: false // Default to light theme
+                }.collectAsState(initial = false)
+
+            AutoSeersTheme(darkTheme = isDarkTheme) {
                 Surface(
                     modifier = Modifier.fillMaxSize()
                 ) {
@@ -113,7 +128,7 @@ class MainActivity : ComponentActivity() {
                         resetAuthState = authViewModel::resetAuthState,
                         onLogoutPressed = {
                             firebaseService.auth.signOut()
-                        }
+                        },
                     )
                 }
             }

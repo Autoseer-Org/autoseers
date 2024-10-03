@@ -76,6 +76,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.androidx.material)
 
+    implementation(libs.androidx.datastore.preferences)
+
     //Navigation
     implementation(libs.androidx.navigation.ui)
     implementation(libs.androidx.navigation.compose)
