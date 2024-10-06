@@ -46,6 +46,8 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import com.innovara.autoseers.R
 import com.innovara.autoseers.navigation.routes.recommendations.buildRecommendedServices
+import com.innovara.autoseers.navigation.routes.settings.buildThemePage
+import com.innovara.autoseers.navigation.routes.settings.navigateToThemePage
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 
@@ -103,8 +105,8 @@ fun NavigationAppManager(
         mutableStateOf(false)
     }
     LaunchedEffect(key1 = currentBackStackEntryAsFlow) {
-        currentBackStackEntryAsFlow.collect{ backStackEntry ->
-            Log.e("CURRENT ROUTE",backStackEntry.destination.route ?: "")
+        currentBackStackEntryAsFlow.collect { backStackEntry ->
+            Log.e("CURRENT ROUTE", backStackEntry.destination.route ?: "")
             isMainRoute = backStackEntry.isAllowedToSeeBottomNavBar()
         }
     }
@@ -206,10 +208,15 @@ fun NavigationAppManager(
                     navController.popBackStack()
                 }
                 buildRecommendedServices(authState)
-                buildSettingsScreen(authState, onLogoutPress = {
+                buildSettingsScreen(authState, navigateToThemePage = {
+                    navController.navigateToThemePage()
+                }, onLogoutPress = {
                     onLogoutPressed()
                     resetAuthState()
                     shouldShowBottomNavBar = false
+                })
+                buildThemePage(onBackPress = {
+                    navController.popBackStack()
                 })
             }
         }

@@ -380,7 +380,7 @@ fun ServiceCard(
     Column(
         modifier = Modifier
             .clip(RoundedCornerShape(12.dp))
-            .background(Color(0XffD9D9D9))
+            .background(MaterialTheme.colorScheme.surfaceDim)
             .padding(18.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
