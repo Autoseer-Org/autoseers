@@ -62,13 +62,16 @@ class HomeViewModel @Inject constructor(
             .collectLatest(::processHomeUploadServiceState)
     }
 
+    fun revokeTokens(tokenId: String) {
+        homeService.revokeToken(tokenId = tokenId)
+    }
+
     private fun processHomeServiceState(homeServiceState: HomeServiceState) {
         when (homeServiceState) {
             is HomeServiceState.Empty -> _homeState.update { HomeState.Empty }
             is HomeServiceState.Loaded -> _homeState.update {
                 HomeState.Loaded(homeModel = homeServiceState.toHomeModel())
             }
-
             is HomeServiceState.Loading -> _homeState.update { HomeState.Loading }
         }
     }

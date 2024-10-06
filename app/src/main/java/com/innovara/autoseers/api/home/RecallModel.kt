@@ -5,13 +5,13 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class RecallsResponse(
-    val count: Int? = null,
-    var recalls: List<RecallItem>? = null,
+    val count: Int = 0,
+    var recalls: List<Recall> = listOf(),
     val failure: String? = null
 )
 
 @Serializable
-data class RecallItem(
+data class Recall(
     val shortSummary: String,
     @SerialName("nhtsa_campaign_number")
     val nhtsaCampaignNumber: String,

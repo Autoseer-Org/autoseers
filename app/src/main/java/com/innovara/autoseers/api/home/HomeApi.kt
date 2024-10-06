@@ -12,4 +12,7 @@ interface HomeApi {
 
     @GET("/home")
     fun fetchHomeData(@Header("Authorization") authHeader: String): Call<HomeResponse>
+
+    @POST("/revokeTokens")
+    fun revokeTokens(@Header("Authorization") authHeader: String): Call<HomeResponse>
 }

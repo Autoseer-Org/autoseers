@@ -5,6 +5,8 @@ import com.innovara.autoseers.api.home.AlertsService
 import com.innovara.autoseers.api.home.AlertsServiceImpl
 import com.innovara.autoseers.api.home.HomeService
 import com.innovara.autoseers.api.home.HomeServiceImpl
+import com.innovara.autoseers.api.home.RecallsService
+import com.innovara.autoseers.api.home.RecallsServiceImpl
 import com.innovara.autoseers.api.onboarding.OnboardingService
 import com.innovara.autoseers.api.onboarding.OnboardingServiceImpl
 import com.innovara.autoseers.api.recommendations.RecommendationsService
@@ -39,4 +41,9 @@ object ApiModule {
     fun provideRecommendationsService(
         retrofit: Retrofit,
     ): RecommendationsService = RecommendationsServiceImpl(retrofit)
+
+    @Provides
+    fun provideRecallsService(
+        retrofit: Retrofit
+    ): RecallsService = RecallsServiceImpl(retrofit)
 }
