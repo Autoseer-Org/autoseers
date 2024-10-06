@@ -120,6 +120,9 @@ dependencies {
 
     //Splash screen
     implementation(libs.androidx.core.splashscreen)
+
+    //Firebase RC
+    implementation(platform(libs.firebase.bom.v3340))
 }
 
 // Allow references to generated code

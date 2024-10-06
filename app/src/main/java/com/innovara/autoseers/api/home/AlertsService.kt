@@ -1,9 +1,11 @@
 package com.innovara.autoseers.api.home
 
+import com.innovara.autoseers.di.firebase.FirebaseService
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.tasks.await
 import retrofit2.Retrofit
 import retrofit2.await
 import javax.inject.Inject
@@ -42,12 +44,16 @@ interface AlertsService {
     suspend fun bookAppointment(token: String, appointmentBookingRequest: AppointmentBookingRequest): Flow<BookAppointmentState>
     suspend fun markAsRepaired(token: String, markAsRepairRequest: MarkAsRepairedRequest): Flow<MarkAsRepairServiceState>
     suspend fun pollBookingStatus(token: String, pollBookingStatusRequest: PollBookingStatusRequest): Flow<PollBookingStatusServiceState>
+    fun renderBookingButton(): Flow<Boolean>
 }
 
 class AlertsServiceImpl @Inject constructor(
-    retrofit: Retrofit
+    retrofit: Retrofit,
+    firebaseService: FirebaseService,
 ) : AlertsService {
     private val api = retrofit.create(AlertsApi::class.java)
+    private val remoteConfig = firebaseService.remoteConfig()
+
     override suspend fun getAlerts(token: String): Flow<AlertsServiceState> = flow {
         emit(AlertsServiceState.Loading)
         val response = api.fetchAlerts(authHeader = token).await()
@@ -97,4 +103,9 @@ class AlertsServiceImpl @Inject constructor(
                 delay(4000L)
             }
         }
+
+    override fun renderBookingButton(): Flow<Boolean> = flow {
+        emit(remoteConfig.getBoolean("bookings"))
+    }
+
 }

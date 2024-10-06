@@ -1,11 +1,15 @@
 package com.innovara.autoseers.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.innovara.autoseers.api.home.HomeService
 import com.innovara.autoseers.api.home.HomeServiceState
 import com.innovara.autoseers.api.home.UploadServiceState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -49,47 +53,56 @@ class HomeViewModel @Inject constructor(
     private val _uploadState: MutableStateFlow<UploadState> = MutableStateFlow(UploadState.Idle)
     val uploadState: StateFlow<UploadState> = _uploadState.asStateFlow()
 
-    suspend fun getHomeData(tokenId: String) {
-        homeService
-            .getHomeData(tokenId)
-            .collectLatest(::processHomeServiceState)
+    private val coroutineExceptionHandler = CoroutineExceptionHandler { context, error ->
+        Log.e("Error in Home ViewModel: ", "${error.message}. In context: $context")
+        context.cancel()
     }
 
-    suspend fun uploadImageReport(tokenId: String, image: ByteArray) {
-        homeService
-            .sendReportUpload(tokenId = tokenId, image = image)
-            .collectLatest(::processHomeUploadServiceState)
-    }
-
-    private fun processHomeServiceState(homeServiceState: HomeServiceState) {
-        when (homeServiceState) {
-            is HomeServiceState.Empty -> _homeState.update { HomeState.Empty }
-            is HomeServiceState.Loaded -> _homeState.update {
-                HomeState.Loaded(homeModel = homeServiceState.toHomeModel())
-            }
-
-            is HomeServiceState.Loading -> _homeState.update { HomeState.Loading }
+    suspend fun getHomeData(tokenId: String) =
+        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
+            homeService
+                .getHomeData(tokenId)
+                .collectLatest(::processHomeServiceState)
         }
-    }
 
-    private fun processHomeUploadServiceState(uploadServiceState: UploadServiceState) {
-        when (uploadServiceState) {
-            is UploadServiceState.Failed -> {
-                _uploadState.update {
-                    UploadState.Failed(
-                        reason = uploadServiceState.reason ?: ""
-                    )
-                }
-                viewModelScope.launch {
-                    delay(3000)
-                    _uploadState.update { UploadState.Idle }
-                }
-            }
-
-            is UploadServiceState.Success -> _uploadState.update { UploadState.Success }
-            is UploadServiceState.Loading -> _uploadState.update { UploadState.Uploading }
+    suspend fun uploadImageReport(tokenId: String, image: ByteArray) =
+        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
+            homeService
+                .sendReportUpload(tokenId = tokenId, image = image)
+                .collectLatest(::processHomeUploadServiceState)
         }
-    }
+
+    private fun processHomeServiceState(homeServiceState: HomeServiceState) =
+        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
+            when (homeServiceState) {
+                is HomeServiceState.Empty -> _homeState.update { HomeState.Empty }
+                is HomeServiceState.Loaded -> _homeState.update {
+                    HomeState.Loaded(homeModel = homeServiceState.toHomeModel())
+                }
+
+                is HomeServiceState.Loading -> _homeState.update { HomeState.Loading }
+            }
+        }
+
+    private fun processHomeUploadServiceState(uploadServiceState: UploadServiceState) =
+        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
+            when (uploadServiceState) {
+                is UploadServiceState.Failed -> {
+                    _uploadState.update {
+                        UploadState.Failed(
+                            reason = uploadServiceState.reason ?: ""
+                        )
+                    }
+                    viewModelScope.launch {
+                        delay(3000)
+                        _uploadState.update { UploadState.Idle }
+                    }
+                }
+
+                is UploadServiceState.Success -> _uploadState.update { UploadState.Success }
+                is UploadServiceState.Loading -> _uploadState.update { UploadState.Uploading }
+            }
+        }
 
     private fun HomeServiceState.Loaded.toHomeModel() = HomeModel(
         repairs = repairs,

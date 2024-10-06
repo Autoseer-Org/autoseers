@@ -380,7 +380,7 @@ fun ServiceCard(
     Column(
         modifier = Modifier
             .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.surfaceDim)
+            .background(MaterialTheme.colorScheme.primary)
             .padding(18.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -390,10 +390,11 @@ fun ServiceCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
-                Text(text = serviceName, style = MaterialTheme.typography.bodyMedium)
+                Text(text = serviceName, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimary)
                 Text(
                     text = "$servicePrice Average price",
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
             Image(
