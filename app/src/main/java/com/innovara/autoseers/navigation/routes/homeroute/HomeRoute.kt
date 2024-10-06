@@ -67,6 +67,7 @@ fun NavGraphBuilder.buildAlertPage(
         val bookingState by alertsViewModel.bookingState.collectAsState()
         val markAsRepairedState by alertsViewModel.repairedState.collectAsState()
         val pollingBookingStatusState by alertsViewModel.pollingBookingStatusState.collectAsState()
+        val shouldShowBookingsButton by alertsViewModel.shouldShowBookingButton.collectAsState()
         AlertPage(
             alertArgument = it.toRoute(),
             navigateBack = onBackPress,
@@ -76,7 +77,8 @@ fun NavGraphBuilder.buildAlertPage(
             bookingState = bookingState,
             markAsRepairedState = markAsRepairedState,
             pollingBookingStatusState = pollingBookingStatusState,
-            startPollingForBookingStatus = alertsViewModel::pollBookingStatus
+            startPollingForBookingStatus = alertsViewModel::pollBookingStatus,
+            shouldShowBookingsButton = shouldShowBookingsButton,
         )
     }
 }

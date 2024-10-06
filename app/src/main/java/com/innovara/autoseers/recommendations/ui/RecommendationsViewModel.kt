@@ -1,5 +1,6 @@
 package com.innovara.autoseers.recommendations.ui
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.innovara.autoseers.api.recommendations.CarInfo
@@ -7,6 +8,9 @@ import com.innovara.autoseers.api.recommendations.Recommendation
 import com.innovara.autoseers.api.recommendations.RecommendationServiceServiceState
 import com.innovara.autoseers.api.recommendations.RecommendationsService
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -40,8 +44,13 @@ class RecommendationsViewModel @Inject constructor(
         MutableStateFlow(RecommendationsState.Idle)
     val state: StateFlow<RecommendationsState> = _state.asStateFlow()
 
-    suspend fun getRecommendations(token: String) {
-        viewModelScope.launch {
+    private val coroutineExceptionHandler = CoroutineExceptionHandler { context, error ->
+        Log.e("Error in Home ViewModel: ", "${error.message}. In context: $context")
+        context.cancel()
+    }
+
+    suspend fun getRecommendations(token: String) =
+        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             recommendationsService.getRecommendations(tokenId = token)
                 .collectLatest { recommendations ->
                     when (recommendations) {
@@ -56,10 +65,9 @@ class RecommendationsViewModel @Inject constructor(
                     }
                 }
         }
-    }
 
-    suspend fun submitManualCarInfo(token: String, carInfo: CarInfo) {
-        viewModelScope.launch {
+    suspend fun submitManualCarInfo(token: String, carInfo: CarInfo) =
+        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             recommendationsService.sendCarInfo(carInfo = carInfo, token = token)
                 .collectLatest { wasSuccessful ->
                     if (wasSuccessful) {
@@ -67,5 +75,4 @@ class RecommendationsViewModel @Inject constructor(
                     }
                 }
         }
-    }
 }
