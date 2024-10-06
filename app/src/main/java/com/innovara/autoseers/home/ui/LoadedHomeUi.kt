@@ -67,6 +67,7 @@ fun LoadedHomeUi(
     homeModel: HomeModel,
     modifier: Modifier = Modifier,
     navigateToAlerts: () -> Unit = {},
+    navigateToRecalls: () -> Unit = {},
     authState: AuthState.UserAuthenticated,
     uploadState: UploadState,
 ) {
@@ -175,6 +176,21 @@ fun LoadedHomeUi(
                     title = "Congratulations! \n" +
                             "You’ve completed ${homeModel.repairs} repairs",
                     description = "You’ve successfully completed ${homeModel.repairs} repair. Keep going!"
+                )
+            }
+            if (homeModel.recalls != null) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Check your recalls",
+                    modifier = Modifier.padding(vertical = 12.dp),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                HomeCard(
+                    modifier = Modifier.clickable {
+                        navigateToRecalls()
+                    },
+                    title = "You have ${homeModel.recalls} recalls for your car",
+                    description = "Based on the data we pulled, we've identified ${homeModel.recalls} open recalls for your car's make, model and year."
                 )
             }
         }

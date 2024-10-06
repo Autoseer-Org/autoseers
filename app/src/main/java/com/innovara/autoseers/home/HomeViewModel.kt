@@ -105,6 +105,10 @@ class HomeViewModel @Inject constructor(
             }
         }
 
+    fun revokeTokens(tokenId: String) {
+        homeService.revokeToken(tokenId = tokenId)
+    }
+
     private fun HomeServiceState.Loaded.toHomeModel() = HomeModel(
         repairs = repairs,
         alerts = alerts,
