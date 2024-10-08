@@ -81,15 +81,16 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlertPage(
-    onBookAppointment: suspend (String, CreateServiceBookingModel) -> Unit = { token: String, createServiceBookingModel: CreateServiceBookingModel -> },
+    onBookAppointment: suspend (String, CreateServiceBookingModel) -> Unit = { _: String, _: CreateServiceBookingModel -> },
     navigateBack: () -> Unit = {},
-    markAsRepaired: suspend (String, MarkAsRepairModel) -> Unit = { token: String, markAsRepairModel: MarkAsRepairModel -> },
+    markAsRepaired: suspend (String, MarkAsRepairModel) -> Unit = { _: String, _: MarkAsRepairModel -> },
     alertArgument: AlertRoute,
     authToken: String,
     bookingState: BookingState,
     markAsRepairedState: MarkAsRepairedState,
     pollingBookingStatusState: PollingBookingStatusState,
     startPollingForBookingStatus: suspend (token: String, partId: String) -> Unit = { _, _ -> },
+    shouldShowBookingsButton: Boolean,
 ) {
     val snackBarState = remember {
         SnackbarHostState()
@@ -172,43 +173,19 @@ fun AlertPage(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(text = "•", style = MaterialTheme.typography.bodyMedium)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(text = alertArgument.alertCategory, style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    text = alertArgument.alertCategory,
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
             Text(
                 text = alertArgument.alertDescription,
                 style = MaterialTheme.typography.bodySmall,
             )
             Spacer(modifier = Modifier.height(16.dp))
-            if (pollingBookingStatusState is PollingBookingStatusState.NotBooked) {
-                Button(onClick = {
-                    showBookingBottomSheet = true
-                }) {
-                    Text(text = "Book appointment")
-                }
-            } else {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    val composition by rememberLottieComposition(
-                        spec = if (pollingBookingStatusState is PollingBookingStatusState.Booked) {
-                            LottieCompositionSpec.RawRes(
-                                R.raw.animation
-                            )
-                        } else {
-                            LottieCompositionSpec.RawRes(
-                                R.raw.animation1
-                            )
-                        }
-                    )
-                    LottieAnimation(
-                        modifier = Modifier.size(100.dp),
-                        composition = composition,
-                        iterations = LottieConstants.IterateForever
-                    )
-                    when (pollingBookingStatusState) {
-                        is PollingBookingStatusState.WaitingToBeBooked -> Text(text = "Processing booking request")
-                        is PollingBookingStatusState.Processing -> Text(text = "Booking appointment")
-                        is PollingBookingStatusState.Booked -> Text(text = "Appointment booked")
-                        else -> Spacer(modifier = Modifier)
-                    }
+            if (shouldShowBookingsButton) {
+                BookingSection(pollingBookingStatusState = pollingBookingStatusState) { startBookingProcess ->
+                    showBookingBottomSheet = startBookingProcess
                 }
             }
             TextButton(onClick = {
@@ -224,6 +201,47 @@ fun AlertPage(
                 Text(text = "Mark as repaired")
             }
         }
+    }
+}
+
+@Composable
+fun BookingSection(
+    pollingBookingStatusState: PollingBookingStatusState,
+    onBookingClicked: (Boolean) -> Unit
+) {
+    when(pollingBookingStatusState) {
+        is PollingBookingStatusState.NotBooked -> Button(onClick = {
+            onBookingClicked(true)
+        }) {
+            Text(text = "Book appointment")
+        }
+        is PollingBookingStatusState.WaitingToBeBooked, PollingBookingStatusState.Booked, PollingBookingStatusState.Processing -> {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                val composition by rememberLottieComposition(
+                    spec = if (pollingBookingStatusState is PollingBookingStatusState.Booked) {
+                        LottieCompositionSpec.RawRes(
+                            R.raw.animation
+                        )
+                    } else {
+                        LottieCompositionSpec.RawRes(
+                            R.raw.animation1
+                        )
+                    }
+                )
+                LottieAnimation(
+                    modifier = Modifier.size(100.dp),
+                    composition = composition,
+                    iterations = LottieConstants.IterateForever
+                )
+                when (pollingBookingStatusState) {
+                    is PollingBookingStatusState.WaitingToBeBooked -> Text(text = "Processing booking request")
+                    is PollingBookingStatusState.Processing -> Text(text = "Booking appointment")
+                    is PollingBookingStatusState.Booked -> Text(text = "Appointment booked")
+                    else -> Unit
+                }
+            }
+        }
+        is PollingBookingStatusState.Idle -> CircularProgressIndicator(modifier = Modifier.size(14.dp))
     }
 }
 

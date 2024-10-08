@@ -14,8 +14,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -28,6 +26,7 @@ import com.innovara.autoseers.navigation.NavigationAppManager
 import com.innovara.autoseers.settings.ui.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -42,6 +41,12 @@ class MainActivity : ComponentActivity() {
     override fun onStart() {
         super.onStart()
         val auth = firebaseService.auth
+        firebaseService.remoteConfig().fetch()
+        firebaseService.remoteConfig().fetchAndActivate().addOnCompleteListener(this) { task ->
+            if (task.isSuccessful) {
+                Log.e("Remote config", "Successfully fetch features flags: ${task.result}")
+            }
+        }
         when (auth.currentUser) {
             null -> {
                 // User is not sign in. Take them to the onboarding page
@@ -103,7 +108,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             val isDarkTheme by applicationContext.dataStore.data
                 .map { preferences ->
-                    preferences[SettingsViewModel.PreferencesKeys.IS_DARK_THEME] ?: false // Default to light theme
+                    preferences[SettingsViewModel.PreferencesKeys.IS_DARK_THEME]
+                        ?: false // Default to light theme
                 }.collectAsState(initial = false)
 
             AutoSeersTheme(darkTheme = isDarkTheme) {

@@ -11,6 +11,7 @@ import com.innovara.autoseers.api.onboarding.OnboardingService
 import com.innovara.autoseers.api.onboarding.OnboardingServiceImpl
 import com.innovara.autoseers.api.recommendations.RecommendationsService
 import com.innovara.autoseers.api.recommendations.RecommendationsServiceImpl
+import com.innovara.autoseers.di.firebase.FirebaseService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -35,7 +36,8 @@ object ApiModule {
     @Provides
     fun provideAlertService(
         retrofit: Retrofit,
-    ): AlertsService = AlertsServiceImpl(retrofit)
+        firebaseService: FirebaseService,
+    ): AlertsService = AlertsServiceImpl(retrofit, firebaseService)
 
     @Provides
     fun provideRecommendationsService(
