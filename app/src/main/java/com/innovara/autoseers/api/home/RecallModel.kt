@@ -12,7 +12,6 @@ data class RecallsResponse(
 
 @Serializable
 data class Recall(
-    val shortSummary: String,
     @SerialName("nhtsa_campaign_number")
     val nhtsaCampaignNumber: String,
     val manufacturer:  String,

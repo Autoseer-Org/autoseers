@@ -111,7 +111,7 @@ fun NavGraphBuilder.buildRecallsPage(
     authState: AuthState,
     onBackPress: () -> Unit,
     navigateToRecall: (RecallRoute) -> Unit = {}
-) = composable<AlertsRoute> {
+) = composable<RecallsRoute> {
     if (authState is AuthState.UserAuthenticated) {
         val recallsViewModel: RecallsViewModel = hiltViewModel()
         LaunchedEffect(key1 = Unit) {
@@ -125,11 +125,12 @@ fun NavGraphBuilder.buildRecallsPage(
 fun NavGraphBuilder.buildRecallPage(
     authState: AuthState,
     onBackPress: () -> Unit
-) = composable<AlertRoute> {
+) = composable<RecallRoute> {
     if (authState is AuthState.UserAuthenticated) {
         val recallsViewModel: RecallsViewModel = hiltViewModel()
         val markAsCompleteState by recallsViewModel.markAsCompleteState.collectAsState()
         RecallPage(
+            navigateBack = onBackPress,
             recallArgument = it.toRoute(),
             authToken = authState.authAuthenticatedModel.getToken(),
             markAsCompleteState = markAsCompleteState

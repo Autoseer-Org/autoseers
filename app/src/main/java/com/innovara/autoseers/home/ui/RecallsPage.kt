@@ -160,7 +160,7 @@ fun RecallCard(
                     Column(horizontalAlignment = Alignment.End) {
                         Text(text = recallModel.status, style = MaterialTheme.typography.bodyMedium)
                         Text(
-                            text = recallModel.reportReceivedDate.toDate(),
+                            text = recallModel.reportReceivedDate,
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
