@@ -100,10 +100,19 @@ fun RecallsPage(
                         RecallCard(
                             modifier = Modifier
                                 .clip(shape = RoundedCornerShape(12.dp))
+                                .background(color = MaterialTheme.colorScheme.primary.copy(alpha = .5f))
                                 .clickable {
                                     navigateToRecall(
                                         RecallRoute(
-
+                                            nhtsaCampaignNumber = recall.nhtsaCampaignNumber,
+                                            manufacturer = recall.manufacturer,
+                                            reportReceivedDate = recall.reportReceivedDate,
+                                            component = recall.component,
+                                            summary = recall.summary,
+                                            consequence = recall.consequence,
+                                            remedy = recall.remedy,
+                                            notes = recall.notes,
+                                            status = recall.status
                                         )
                                     )
                                 },
@@ -137,10 +146,10 @@ fun RecallCard(
     recallModel: RecallModel,
 ) {
     val modifierColor = when (recallModel.status) {
-        "Incomplete" -> modifier.background(color = MaterialTheme.colorScheme.error.copy(alpha = .5f))
+        "INCOMPLETE" -> modifier.background(color = MaterialTheme.colorScheme.error.copy(alpha = .5f))
         else -> modifier
     }
-    Column(modifierColor.padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Column(modifier = modifierColor.padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -158,10 +167,15 @@ fun RecallCard(
             Column(modifier = Modifier, horizontalAlignment = Alignment.End) {
                 Box {
                     Column(horizontalAlignment = Alignment.End) {
-                        Text(text = recallModel.status, style = MaterialTheme.typography.bodyMedium)
+                        Text(
+                            text = recallModel.status,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
                         Text(
                             text = recallModel.reportReceivedDate,
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }
