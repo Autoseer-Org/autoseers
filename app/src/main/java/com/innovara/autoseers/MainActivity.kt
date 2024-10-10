@@ -1,6 +1,7 @@
 package com.innovara.autoseers
 
 import android.content.Context
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -90,6 +91,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         installSplashScreen()
 
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         val content: View = findViewById(android.R.id.content)
         content.viewTreeObserver.addOnPreDrawListener(
             object : ViewTreeObserver.OnPreDrawListener {
@@ -134,6 +136,8 @@ class MainActivity : ComponentActivity() {
                         resetAuthState = authViewModel::resetAuthState,
                         onLogoutPressed = {
                             firebaseService.auth.signOut()
+                            val authenticatedModel = AuthAuthenticatedModel(context = this)
+                            authViewModel.revokeTokens(tokenId = authenticatedModel.getToken())
                         },
                     )
                 }
@@ -144,9 +148,5 @@ class MainActivity : ComponentActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         authViewModel.storeCurrentVerificationStep(outState)
         super.onSaveInstanceState(outState)
-    }
-
-    private fun setupAuthViewModel() {
-        val authViewModel: AuthViewModel = AuthViewModel()
     }
 }

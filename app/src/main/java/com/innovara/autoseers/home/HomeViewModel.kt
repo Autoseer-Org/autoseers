@@ -41,6 +41,7 @@ data class HomeModel(
     val repairs: Int,
     val uploadedReports: Int,
     val carModelMake: String,
+    val recalls: Int? = null,
 )
 
 @HiltViewModel
@@ -104,12 +105,17 @@ class HomeViewModel @Inject constructor(
             }
         }
 
+    fun revokeTokens(tokenId: String) {
+        homeService.revokeToken(tokenId = tokenId)
+    }
+
     private fun HomeServiceState.Loaded.toHomeModel() = HomeModel(
         repairs = repairs,
         alerts = alerts,
         healthScore = health,
         totalMileage = mileage,
         uploadedReports = uploads,
-        carModelMake = carModelMake
+        carModelMake = carModelMake,
+        recalls = recalls
     )
 }

@@ -16,14 +16,14 @@ sealed class ManualEntryServiceState {
 }
 
 interface ManualEntryService {
-    suspend fun manuallyEnterCardData(tokenId: String, year: String, make: String, model: String, mileage: String): Flow<ManualEntryServiceState>
+    suspend fun manuallyEnterCarData(tokenId: String, year: String, make: String, model: String, mileage: String): Flow<ManualEntryServiceState>
 }
 
 class ManualEntryServiceImpl @Inject constructor(
     retrofit: Retrofit
 ): ManualEntryService {
     private val manualEntryApi = retrofit.create(ManualEntryApi::class.java)
-    override suspend fun manuallyEnterCardData(
+    override suspend fun manuallyEnterCarData(
         tokenId: String,
         year: String,
         make: String,

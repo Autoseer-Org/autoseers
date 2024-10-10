@@ -29,12 +29,14 @@ sealed class HomeServiceState {
         val uploads: Int,
         val health: Int,
         val carModelMake: String = "Unknown",
+        val recalls: Int? = null,
     ) : HomeServiceState()
 }
 
 interface HomeService {
     suspend fun sendReportUpload(tokenId: String, image: ByteArray): Flow<UploadServiceState>
     suspend fun getHomeData(tokenId: String): Flow<HomeServiceState>
+    fun revokeToken(tokenId: String)
 }
 
 class HomeServiceImpl @Inject constructor(
@@ -70,12 +72,17 @@ class HomeServiceImpl @Inject constructor(
         emit(HomeServiceState.Empty)
     }
 
+    override fun revokeToken(tokenId: String) {
+        homeApi.revokeTokens(tokenId)
+    }
+
     private fun HomeData.toHomeServiceLoadedState() = HomeServiceState.Loaded(
         mileage = mileage ?: 0,
         alerts = alerts,
         carModelMake = "${make?.lowercase(Locale.ROOT)?.capitalize(Locale.ROOT)} ${model?.capitalize(Locale.ROOT)}",
         health = healthScore,
         repairs = repairs,
-        uploads = reports
+        uploads = reports,
+        recalls = recalls
     )
 }

@@ -17,6 +17,8 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
+import com.innovara.autoseers.api.home.HomeService
+import com.innovara.autoseers.home.HomeViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -136,6 +138,7 @@ sealed class AuthState {
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
+    val homeService: HomeService
 ) : ViewModel() {
 
     private var currentVerificationStatus: VerificationStatus = VerificationStatus.UNKNOWN
@@ -164,6 +167,7 @@ class AuthViewModel @Inject constructor(
                         user?.getIdToken(true)?.addOnCompleteListener { tokenTask ->
                             _authState.update {
                                 val authenticatedModel = AuthAuthenticatedModel(context = activity)
+                                Log.d("User Auth Token", "${tokenTask.result.token ?: ""}")
                                 authenticatedModel.storeNewToken(tokenId = tokenTask.result.token ?: "")
                                 AuthState.UserAuthenticated(
                                     authAuthenticatedModel = authenticatedModel,
@@ -328,6 +332,11 @@ class AuthViewModel @Inject constructor(
             )
             signInWithPhoneAuthCredential(auth, credentials, activity)
         }
+    }
+
+    fun revokeTokens(tokenId: String) {
+        val homeViewModel = HomeViewModel(homeService = homeService)
+        homeViewModel.revokeTokens(tokenId = tokenId)
     }
 
     fun resetAuthState(authState: AuthState? = null) =

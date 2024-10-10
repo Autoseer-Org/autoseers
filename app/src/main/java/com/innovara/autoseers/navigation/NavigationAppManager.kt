@@ -45,6 +45,9 @@ import com.innovara.autoseers.onboarding.logic.OnboardingViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import com.innovara.autoseers.R
+import com.innovara.autoseers.navigation.routes.homeroute.RecallsRoute
+import com.innovara.autoseers.navigation.routes.homeroute.buildRecallPage
+import com.innovara.autoseers.navigation.routes.homeroute.buildRecallsPage
 import com.innovara.autoseers.navigation.routes.recommendations.buildRecommendedServices
 import com.innovara.autoseers.navigation.routes.settings.buildThemePage
 import com.innovara.autoseers.navigation.routes.settings.navigateToThemePage
@@ -196,15 +199,33 @@ fun NavigationAppManager(
                 onNameEnteredEvents = analyticsEvents,
             )
             navigation<AutoSeersExperience>(startDestination = HomeRoute) {
-                buildHomeScreen(authState) {
-                    navController.navigate(AlertsRoute)
-                }
+                buildHomeScreen(
+                    authState,
+                    navigateToAlerts = {
+                        navController.navigate(AlertsRoute)
+                    },
+                    navigateToRecalls = {
+                        navController.navigate(RecallsRoute)
+                    }
+                )
                 buildAlertsPage(
                     authState,
-                    onBackPress = { navController.popBackStack() }) { alertRoute ->
-                    navController.navigate(alertRoute)
-                }
+                    onBackPress = { navController.popBackStack() },
+                    navigateToAlert = { alertRoute ->
+                        navController.navigate(alertRoute)
+                    }
+                )
                 buildAlertPage(authState) {
+                    navController.popBackStack()
+                }
+                buildRecallsPage(
+                    authState,
+                    onBackPress = { navController.popBackStack() },
+                    navigateToRecall = { recallRoute ->
+                        navController.navigate(recallRoute)
+                    }
+                )
+                buildRecallPage(authState) {
                     navController.popBackStack()
                 }
                 buildRecommendedServices(authState)

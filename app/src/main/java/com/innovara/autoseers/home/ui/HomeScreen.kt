@@ -69,6 +69,7 @@ fun HomeScreen(
     authState: AuthState.UserAuthenticated,
     homeViewModel: HomeViewModel = hiltViewModel<HomeViewModel>(),
     navigateToAlerts: () -> Unit,
+    navigateToRecalls: () -> Unit,
     onFailToUploadImage: () -> Unit = {},
 ) {
     var uri by remember {
@@ -147,6 +148,7 @@ fun HomeScreen(
                 is HomeState.Loaded -> LoadedHomeUi(
                     homeState.homeModel,
                     navigateToAlerts = navigateToAlerts,
+                    navigateToRecalls = navigateToRecalls,
                     uploadState = uploadState,
                     authState = authState
                 )
