@@ -33,7 +33,7 @@ fun BottomNavBar(navController: NavController, items: List<BottomNavItem>) {
             NavigationBarItem(
                 icon = {
                        if (isItemSelected) {
-                           Icon(item.iconSelected, contentDescription = item.label)
+                           Icon(item.iconSelected, contentDescription = item.label, tint = MaterialTheme.colorScheme.onPrimary)
                        } else {
                            Icon(item.icon, contentDescription = item.label)
                        }

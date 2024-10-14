@@ -66,6 +66,7 @@ fun CodeAuthenticationScreen(
                     snackbarHostState.showSnackbar(authState.errorMessage ?: "")
                 }
             }
+
             else -> Unit
         }
     }
@@ -81,6 +82,10 @@ fun CodeAuthenticationScreen(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         }) { paddingValues ->
+        val style = MaterialTheme.typography.headlineLarge
+        var headerTextStyle by remember {
+            mutableStateOf(style)
+        }
         Column(
             modifier = Modifier
                 .padding(paddingValues)
@@ -89,7 +94,14 @@ fun CodeAuthenticationScreen(
         ) {
             Text(
                 text = stringResource(id = R.string.code_sent_title),
-                style = MaterialTheme.typography.headlineLarge
+                style = headerTextStyle,
+                softWrap = false,
+                onTextLayout = { textLayoutResult ->
+                    if (textLayoutResult.didOverflowWidth) {
+                        headerTextStyle =
+                            headerTextStyle.copy(fontSize = headerTextStyle.fontSize * .9)
+                    }
+                }
             )
             Text(text = stringResource(id = R.string.code_sent_message))
 

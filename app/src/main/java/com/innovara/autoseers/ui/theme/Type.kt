@@ -28,8 +28,8 @@ val fontFamily = FontFamily(
 val AppTypography = Typography(
     headlineLarge = TextStyle(
         fontFamily = fontFamily,
-        fontSize = 42.sp,
-        fontWeight = FontWeight.Bold
+        fontSize = 38.sp,
+        fontWeight = FontWeight.ExtraBold
     ),
     bodySmall = TextStyle(
         fontFamily = fontFamily,
@@ -47,7 +47,8 @@ val AppTypography = Typography(
         fontFamily = fontFamily,
         fontSize = 18.sp,
         fontWeight = FontWeight.Bold
-    )
+    ),
+    bodyLarge = TextStyle(fontFamily = fontFamily, fontSize = 18.sp, fontWeight = FontWeight.Bold),
 )
 
 

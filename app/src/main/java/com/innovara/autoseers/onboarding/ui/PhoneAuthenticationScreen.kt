@@ -92,8 +92,10 @@ fun PhoneAuthenticationScreen(
             Text(text = stringResource(id = R.string.sign_up_flow_title.takeIf { isSignUpFlow }
                 ?: R.string.sign_in_flow_title), style = MaterialTheme.typography.headlineLarge)
 
-            Text(text = stringResource(id = R.string.sign_up_long_message.takeIf { isSignUpFlow }
-                ?: R.string.sign_in_long_message))
+            Text(
+                text = stringResource(id = R.string.sign_up_long_message.takeIf { isSignUpFlow }
+                    ?: R.string.sign_in_long_message),
+                style = MaterialTheme.typography.bodySmall)
 
             TextField(
                 modifier = Modifier
