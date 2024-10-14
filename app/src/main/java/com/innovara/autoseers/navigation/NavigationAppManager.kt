@@ -55,7 +55,7 @@ import kotlinx.coroutines.flow.map
  * NavigationAppManager serves as the entry point for creating the nav graph for the app
  * Currently the destination type is [Hosted]. And has a nested graph to enforce separation of entities and usability
  *
- * Uses home routes and onboarding routes to navigate between the 2 pages.
+ * Uses multiple routes to navigate between pages.
  * A routes describes how to get to a destination. A route can have a payload attached to it
  */
 @Composable
@@ -105,7 +105,7 @@ fun NavigationAppManager(
         mutableStateOf(false)
     }
     LaunchedEffect(key1 = currentBackStackEntryAsFlow) {
-        currentBackStackEntryAsFlow.collect { backStackEntry ->
+        currentBackStackEntryAsFlow.collectLatest { backStackEntry ->
             Log.e("CURRENT ROUTE", backStackEntry.destination.route ?: "")
             isMainRoute = backStackEntry.isAllowedToSeeBottomNavBar()
         }
@@ -161,7 +161,6 @@ fun NavigationAppManager(
                 onPhoneNumberEntered = onPhoneNumberEntered,
                 onBackPressed = {
                     navController.popBackStack()
-                    resetAuthState()
                 },
                 onPhoneAuthEvents = analyticsEvents,
             )

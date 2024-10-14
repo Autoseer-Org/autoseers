@@ -1,5 +1,6 @@
 package com.innovara.autoseers.api.recommendations
 
+import android.util.Log
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -53,17 +54,18 @@ class RecommendationsServiceImpl @Inject constructor(
     override suspend fun sendCarInfo(carInfo: CarInfo, token: String): Flow<Boolean> = flow {
         val response = api.manualEntryForCarInfo(
             authHeader = token,
-            manualEntryRequest = carInfo.toManualEntryRequest(token)
+            manualEntryRequest = carInfo.toManualEntryRequest()
         ).await()
         when {
             response.failure.isNullOrBlank() -> emit(true)
             else -> emit(false)
         }
     }.catch {
+        Log.e("Error sending car info", it.localizedMessage ?: "")
         emit(false)
     }
 
-    private fun CarInfo.toManualEntryRequest(token: String) = ManualEntryRequest(
+    private fun CarInfo.toManualEntryRequest() = ManualEntryRequest(
         make = make,
         model = model,
         year = year.toString(),

@@ -35,6 +35,8 @@ data class HomeData(
     val make: String? = null,
     @SerialName("model")
     val model: String? = null,
+    @SerialName("estimatedCarPrice")
+    val estimatedCarPrice: String? = null
 )
 
 @Serializable
