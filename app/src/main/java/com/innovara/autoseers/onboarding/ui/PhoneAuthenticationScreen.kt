@@ -33,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.core.text.isDigitsOnly
 import com.innovara.autoseers.AuthState
 import com.innovara.autoseers.R
 import com.innovara.autoseers.onboarding.logic.OnboardingEvents
@@ -92,10 +93,8 @@ fun PhoneAuthenticationScreen(
             Text(text = stringResource(id = R.string.sign_up_flow_title.takeIf { isSignUpFlow }
                 ?: R.string.sign_in_flow_title), style = MaterialTheme.typography.headlineLarge)
 
-            Text(
-                text = stringResource(id = R.string.sign_up_long_message.takeIf { isSignUpFlow }
-                    ?: R.string.sign_in_long_message),
-                style = MaterialTheme.typography.bodySmall)
+            Text(text = stringResource(id = R.string.sign_up_long_message.takeIf { isSignUpFlow }
+                ?: R.string.sign_in_long_message))
 
             TextField(
                 modifier = Modifier
@@ -103,7 +102,9 @@ fun PhoneAuthenticationScreen(
                     .fillMaxWidth(),
                 value = phoneNumber,
                 onValueChange = {
-                    phoneNumber = it
+                    if (it.isDigitsOnly()) {
+                        phoneNumber = it
+                    }
                 },
                 label = {
                     Text(text = "Phone number")

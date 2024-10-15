@@ -9,9 +9,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.innovara.autoseers.AuthState
 import com.innovara.autoseers.home.AlertsViewModel
+import com.innovara.autoseers.home.RecallsViewModel
 import com.innovara.autoseers.home.ui.AlertPage
 import com.innovara.autoseers.home.ui.AlertsPage
 import com.innovara.autoseers.home.ui.HomeScreen
+import com.innovara.autoseers.home.ui.RecallPage
+import com.innovara.autoseers.home.ui.RecallsPage
 import com.innovara.autoseers.navigation.routes.GlobalRoute
 import kotlinx.serialization.Serializable
 
@@ -32,13 +35,34 @@ data class AlertRoute(
     val alertId: String = ""
 ) : GlobalRoute()
 
+@Serializable
+object RecallsRoute : GlobalRoute()
+
+@Serializable
+data class RecallRoute(
+    val nhtsaCampaignNumber: String = "",
+    val manufacturer:  String = "",
+    val reportReceivedDate: String = "",
+    val component: String = "",
+    val summary: String = "",
+    val consequence: String = "",
+    val remedy: String = "",
+    val notes: String = "",
+    val status: String = ""
+) : GlobalRoute()
+
 fun NavGraphBuilder.buildHomeScreen(
     authState: AuthState,
     navigateToAlerts: () -> Unit,
+    navigateToRecalls: () -> Unit,
 ) {
     composable<HomeRoute> {
         if (authState is AuthState.UserAuthenticated) {
-            HomeScreen(authState, navigateToAlerts = navigateToAlerts)
+            HomeScreen(
+                authState,
+                navigateToAlerts = navigateToAlerts,
+                navigateToRecalls = navigateToRecalls
+            )
         }
     }
 }
@@ -79,6 +103,37 @@ fun NavGraphBuilder.buildAlertPage(
             pollingBookingStatusState = pollingBookingStatusState,
             startPollingForBookingStatus = alertsViewModel::pollBookingStatus,
             shouldShowBookingsButton = shouldShowBookingsButton,
+        )
+    }
+}
+
+fun NavGraphBuilder.buildRecallsPage(
+    authState: AuthState,
+    onBackPress: () -> Unit,
+    navigateToRecall: (RecallRoute) -> Unit = {}
+) = composable<RecallsRoute> {
+    if (authState is AuthState.UserAuthenticated) {
+        val recallsViewModel: RecallsViewModel = hiltViewModel()
+        LaunchedEffect(key1 = Unit) {
+            recallsViewModel.getRecalls(authState.authAuthenticatedModel.getToken())
+        }
+        val state by recallsViewModel.state.collectAsState()
+        RecallsPage(state, onBackPress = onBackPress, navigateToRecall = navigateToRecall)
+    }
+}
+
+fun NavGraphBuilder.buildRecallPage(
+    authState: AuthState,
+    onBackPress: () -> Unit
+) = composable<RecallRoute> {
+    if (authState is AuthState.UserAuthenticated) {
+        val recallsViewModel: RecallsViewModel = hiltViewModel()
+        val markAsCompleteState by recallsViewModel.markAsCompleteState.collectAsState()
+        RecallPage(
+            navigateBack = onBackPress,
+            recallArgument = it.toRoute(),
+            authToken = authState.authAuthenticatedModel.getToken(),
+            markAsCompleteState = markAsCompleteState
         )
     }
 }

@@ -10,7 +10,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -46,7 +45,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.airbnb.lottie.compose.LottieAnimation
@@ -71,6 +69,7 @@ fun HomeScreen(
     authState: AuthState.UserAuthenticated,
     homeViewModel: HomeViewModel = hiltViewModel<HomeViewModel>(),
     navigateToAlerts: () -> Unit,
+    navigateToRecalls: () -> Unit,
     onFailToUploadImage: () -> Unit = {},
 ) {
     var uri by remember {
@@ -126,7 +125,7 @@ fun HomeScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
                 onClick = {
                     uri = HomeFileProvider.getImageUri(context = context)
                     carReportPicker.launch(uri)
@@ -134,6 +133,13 @@ fun HomeScreen(
                 Icon(imageVector = Icons.Filled.Add, contentDescription = "")
             }
         },
+        topBar = {
+            if (state is HomeState.Loaded) {
+                TopAppBar(title = {
+                    Text(text = (state as HomeState.Loaded).homeModel.carModelMake)
+                })
+            }
+        }
     ) {
         Surface(modifier = Modifier.padding(it)) {
             when (val homeState = state) {
@@ -142,6 +148,7 @@ fun HomeScreen(
                 is HomeState.Loaded -> LoadedHomeUi(
                     homeState.homeModel,
                     navigateToAlerts = navigateToAlerts,
+                    navigateToRecalls = navigateToRecalls,
                     uploadState = uploadState,
                 )
             }
@@ -158,8 +165,7 @@ fun EmptyHomeUi(modifier: Modifier = Modifier, uploadState: UploadState) {
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if (uploadState is UploadState.Uploading) {
                 val composition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.raw.animation2))
@@ -184,10 +190,8 @@ fun EmptyHomeUi(modifier: Modifier = Modifier, uploadState: UploadState) {
                     iterations = LottieConstants.IterateForever
                 )
                 Text(
-                    text = "Start by uploading your car multi-checkpoint\n" +
-                            "report.",
-                    style = MaterialTheme.typography.bodyLarge,
-                    textAlign = TextAlign.Center
+                    text = "You can upload your multi-checkpoint\n" +
+                            "report by pressing on the plus sign"
                 )
             }
         }

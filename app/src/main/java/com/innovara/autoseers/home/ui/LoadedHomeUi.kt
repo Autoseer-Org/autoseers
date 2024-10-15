@@ -73,6 +73,7 @@ fun LoadedHomeUi(
     homeModel: HomeModel,
     modifier: Modifier = Modifier,
     navigateToAlerts: () -> Unit = {},
+    navigateToRecalls: () -> Unit = {},
     uploadState: UploadState,
 ) {
     val scrollableState = rememberScrollState()
@@ -231,6 +232,20 @@ fun LoadedHomeUi(
                             description = "You’ve successfully completed ${homeModel.repairs} repair. Keep going!"
                         ) { Unit }
                     }
+                }
+            }
+            if (homeModel.recalls != null) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Check your recalls",
+                    modifier = Modifier.padding(vertical = 12.dp),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                HomeCard(
+                    title = "You have ${homeModel.recalls} recalls for your car",
+                    description = "Based on the data we pulled, we've identified ${homeModel.recalls} open recalls for your car's make, model and year."
+                ) {
+                    navigateToRecalls()
                 }
             }
         }
@@ -440,7 +455,7 @@ fun PreviewLoadedHomeUi() {
     Scaffold {
         CompositionLocalProvider {
             LoadedHomeUi(
-                homeModel = HomeModel(40, 12000, 2, 1, 1, "Toyota Corolla", "$12000.00"),
+                homeModel = HomeModel(40, 12000, 2, 1, 1, "Toyota Corolla", 2, "$12000.00"),
                 modifier = Modifier.padding(it),
                 uploadState = UploadState.Idle,
             )

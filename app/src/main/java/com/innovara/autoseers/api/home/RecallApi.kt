@@ -11,5 +11,5 @@ interface RecallApi {
     fun fetchRecalls(@Header("Authorization") authorizationToken: String): Call<RecallsResponse>
 
     @POST("/completeRecall")
-    fun completeRecall(@Body completeRecallRequest: CompleteRecallRequest): Call<CompleteRecallResponse>
+    fun completeRecall(@Header("Authorization") authorizationToken: String, @Body completeRecallRequest: CompleteRecallRequest): Call<CompleteRecallResponse>
 }
