@@ -4,27 +4,31 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredWidthIn
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.InlineTextContent
-import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
@@ -40,21 +44,23 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.DrawResult
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.drawscope.Fill
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.Placeholder
-import androidx.compose.ui.text.PlaceholderVerticalAlign
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.innovara.autoseers.AuthAuthenticatedModel
-import com.innovara.autoseers.AuthState
+import androidx.compose.ui.zIndex
 import com.innovara.autoseers.R
 import com.innovara.autoseers.home.HomeModel
 import com.innovara.autoseers.home.UploadState
@@ -68,7 +74,6 @@ fun LoadedHomeUi(
     modifier: Modifier = Modifier,
     navigateToAlerts: () -> Unit = {},
     navigateToRecalls: () -> Unit = {},
-    authState: AuthState.UserAuthenticated,
     uploadState: UploadState,
 ) {
     val scrollableState = rememberScrollState()
@@ -77,27 +82,58 @@ fun LoadedHomeUi(
     }
     val bottomSheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
+    var selectedSheet: CarInfoSectionType? by remember {
+        mutableStateOf(null)
+    }
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     if (shouldShowBottomSheet) {
-        ModalBottomSheet(onDismissRequest = {
-            shouldShowBottomSheet = false
-        }) {
+        ModalBottomSheet(
+            sheetState = sheetState,
+            onDismissRequest = {
+                shouldShowBottomSheet = false
+            }) {
             Surface {
                 Column(
                     modifier = Modifier
                         .padding(12.dp)
                         .padding(vertical = 24.dp)
                 ) {
-                    Text(
-                        text = "Health Score of Your Car",
-                        style = MaterialTheme.typography.displaySmall
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        "Your car's overall health score is ${homeModel.healthScore}%. " +
-                                "This score is a comprehensive measure of your vehicle's condition, " +
-                                "derived from a detailed analysis of various key components. " +
-                                "It provides an easy-to-understand summary of the health of your car."
-                    )
+                    when (selectedSheet) {
+                        CarInfoSectionType.HEALTH -> {
+                            Text(
+                                text = "Your Vehicle's Condition Score",
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                "Your vehicle’s condition score is ${homeModel.healthScore}%, powered " +
+                                        "by Gemini AI using your car's checkpoint report. It gives you a" +
+                                        " quick rundown of your car's health, but just a heads up—it’s " +
+                                        "AI-driven, so it might not always be 100% accurate.",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+
+                        CarInfoSectionType.PRICE -> {
+                            Text(
+                                text = "Your Vehicle's estimated value",
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                "This estimate gives you a quick snapshot of your car's current market value, based on several key factors:\n" +
+                                        "\n" +
+                                        "\n• Make & Model: How your car's brand and type stack up in the market.\n" +
+                                        "\n• Year: The age of your vehicle plays a role in its value.\n" +
+                                        "\n• Mileage: Higher mileage can affect resale value, while lower mileage keeps it higher.\n" +
+                                        "\n• Condition: The overall health and maintenance of your car, reflected in its condition score, impacts the estimate.\n" +
+                                        "\n\nKeep in mind, this estimate is AI-generated and may vary from actual market prices. Always consider consulting a professional for a more detailed appraisal.",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+
+                        null -> Unit
+                    }
                 }
             }
         }
@@ -105,43 +141,63 @@ fun LoadedHomeUi(
     if (uploadState is UploadState.Uploading) {
         EmptyHomeUi(modifier, uploadState)
     } else {
+        val screenWidth = LocalConfiguration.current.screenWidthDp
+        val screenHeight = LocalConfiguration.current.screenHeightDp
         Column(
             modifier = modifier
+                .drawBehind {
+                    val yOffset = scrollableState.value * 1.2
+                    this.center.copy(0f, 0f)
+                    drawRect(
+                        topLeft = Offset(0f, -yOffset.toFloat()),
+                        size = Size(
+                            height = screenHeight.dp.toPx() * .5f,
+                            width = screenWidth.dp.toPx()
+                        ),
+                        brush = Brush.radialGradient(
+                            listOf(Color.Transparent, Color.Black),
+                            radius = .1.dp.toPx(),
+                        ),
+                        style = Fill
+                    )
+                }
+                .graphicsLayer {
+                    clip = true
+                }
                 .fillMaxSize()
                 .verticalScroll(scrollableState)
                 .padding(18.dp)
                 .padding(bottom = 10.dp),
             verticalArrangement = Arrangement.spacedBy(18.dp)
         ) {
-            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                Image(
-                    modifier = Modifier.size(200.dp),
-                    contentScale = ContentScale.FillWidth,
-                    painter = painterResource(id = R.drawable.modern_car), contentDescription = ""
+            Spacer(modifier = Modifier.height(38.dp))
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopStart) {
+                Text(
+                    text = homeModel.carModelMake,
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
             Text(
-                buildAnnotatedString {
-                append("Welcome ${authState.authAuthenticatedModel.userName}")
-                append(" ")
-                appendInlineContent("icon")
-            }, inlineContent = mapOf(
-                "icon" to InlineTextContent(
-                    Placeholder(36.sp, 36.sp, PlaceholderVerticalAlign.TextCenter),
-                ) {
-                    Text(text = "\uD83D\uDE0A", fontSize = 24.sp)
-                }
-            ), fontStyle = FontStyle.Italic, fontWeight = FontWeight.Bold, fontSize = 26.sp)
-            Text(text = "Check on your car’s health and find ways to improve it")
-            HealthScoreRow(healthScore = homeModel.healthScore, onInfoIconClicked = {
-                scope.launch {
-                    bottomSheetState.show()
-                }.invokeOnCompletion {
-                    if (!shouldShowBottomSheet) {
-                        shouldShowBottomSheet = true
+                text = "Stay in the loop with your car’s health! Get custom alerts, a value estimate," +
+                        " and recommended services just for you.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+            // Contains information about the health of the car and the estimated car price
+            CarInfoRow(
+                healthScore = homeModel.healthScore,
+                estimatedCarPrice = homeModel.estimatedCarPrice,
+                onInfoIconClicked = { carInfoType ->
+                    scope.launch {
+                        bottomSheetState.show()
+                    }.invokeOnCompletion {
+                        if (!shouldShowBottomSheet) {
+                            shouldShowBottomSheet = true
+                            selectedSheet = carInfoType
+                        }
                     }
-                }
-            })
+                })
             DashboardSection(
                 mileage = homeModel.totalMileage.toString(),
                 alerts = homeModel.alerts,
@@ -149,34 +205,34 @@ fun LoadedHomeUi(
                 uploads = homeModel.uploadedReports
             )
             if (homeModel.alerts > 0) {
+                val horizontalScrollState = rememberScrollState()
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Things to keep in mind",
-                    modifier = Modifier.padding(vertical = 12.dp),
+                    text = "Things to Keep in Mind!",
                     style = MaterialTheme.typography.bodyLarge
                 )
-                HomeCard(
-                    modifier = Modifier.clickable {
-                        navigateToAlerts()
-                    },
-                    title = "You have ${homeModel.alerts} active alerts for your car",
-                    description = "Based on your recent reports, we've identified ${homeModel.alerts} issues that need your attention soon."
-                )
-            }
-            if (homeModel.repairs > 0) {
-                Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Achievements",
-                    modifier = Modifier.padding(vertical = 12.dp),
-                    style = MaterialTheme.typography.bodyLarge
+                    text = "Important alerts and updates to stay on top of your car's health.",
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(vertical = 4.dp),
                 )
-                HomeCard(
-                    color = MaterialTheme.colorScheme.tertiary.copy(alpha = .5f),
-                    imageRes = R.drawable.check,
-                    title = "Congratulations! \n" +
-                            "You’ve completed ${homeModel.repairs} repairs",
-                    description = "You’ve successfully completed ${homeModel.repairs} repair. Keep going!"
-                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.horizontalScroll(horizontalScrollState, enabled = true)
+                ) {
+                    HomeCard(
+                        title = "Your car alerts",
+                        description = "Based on your recent reports, we've identified ${homeModel.alerts} issues that need your attention soon."
+                    ) { navigateToAlerts() }
+                    if (homeModel.repairs > 0) {
+                        HomeCard(
+                            imageRes = R.drawable.check,
+                            title = "Congratulations!",
+                            description = "You’ve successfully completed ${homeModel.repairs} repair. Keep going!"
+                        ) { Unit }
+                    }
+                }
             }
             if (homeModel.recalls != null) {
                 Spacer(modifier = Modifier.height(4.dp))
@@ -199,35 +255,43 @@ fun LoadedHomeUi(
 
 @Composable
 fun HomeCard(
-    modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.error.copy(alpha = .5f),
     @DrawableRes imageRes: Int = R.drawable.nut,
     title: String = "",
     description: String = "",
+    onCardPress: () -> Unit,
 ) {
-    Row(
-        modifier = modifier
-            .clip(shape = RoundedCornerShape(12.dp))
-            .background(color)
-            .padding(vertical = 12.dp)
-            .padding(12.dp)
-    ) {
-        Box {
-            Image(
-                modifier = Modifier.size(50.dp),
-                painter = painterResource(id = imageRes),
-                contentDescription = ""
-            )
+    ElevatedCard(modifier = Modifier.clickable { onCardPress() }) {
+        val style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+        var titleStyle by remember {
+            mutableStateOf(style)
         }
         Column(
-            modifier = Modifier.wrapContentSize(),
+            modifier = Modifier
+                .wrapContentSize()
+                .requiredWidthIn(max = 200.dp)
+                .height(250.dp)
+                .padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            Box {
+                Image(
+                    modifier = Modifier.size(30.dp),
+                    painter = painterResource(id = imageRes),
+                    contentDescription = "",
+                )
+            }
             Text(
-                title,
-                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+                text = title,
+                style = titleStyle,
+                softWrap = false,
+                modifier = Modifier.widthIn(max = 150.dp),
+                onTextLayout = { textLayout ->
+                    if (textLayout.didOverflowWidth) {
+                        titleStyle = titleStyle.copy(fontSize = titleStyle.fontSize * .9)
+                    }
+                }
             )
-            Text(description)
+            Text(description, style = MaterialTheme.typography.bodySmall)
         }
     }
 }
@@ -243,13 +307,17 @@ fun DashboardSection(
     Row(
         modifier = modifier
             .clip(shape = RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.primary)
+            .background(MaterialTheme.colorScheme.secondaryContainer)
             .fillMaxWidth()
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(text = "Total \nMileage", color = Color.White)
+            Text(
+                text = "Total \nMileage",
+                color = Color.White,
+                style = MaterialTheme.typography.bodyMedium
+            )
             Text(
                 text = mileage.toFormattedNumber(),
                 color = Color.White,
@@ -264,7 +332,7 @@ fun DashboardSection(
                 contentDescription = "",
                 tint = Color.White
             )
-            Text(text = "Alerts", color = Color.White)
+            Text(text = "Alerts", color = Color.White, style = MaterialTheme.typography.bodyMedium)
             Spacer(modifier = Modifier.height(12.dp))
             Text(text = "$alerts", color = Color.White)
         }
@@ -274,7 +342,7 @@ fun DashboardSection(
                 contentDescription = "",
                 tint = Color.White
             )
-            Text(text = "Repairs", color = Color.White)
+            Text(text = "Repairs", color = Color.White, style = MaterialTheme.typography.bodyMedium)
             Spacer(modifier = Modifier.height(12.dp))
             Text(text = "$repairs", color = Color.White)
         }
@@ -284,38 +352,103 @@ fun DashboardSection(
                 contentDescription = "",
                 tint = Color.White
             )
-            Text(text = "Reports", color = Color.White)
+            Text(text = "Reports", color = Color.White, style = MaterialTheme.typography.bodyMedium)
             Spacer(modifier = Modifier.height(12.dp))
             Text(text = "$uploads", color = Color.White)
         }
     }
 }
 
+enum class CarInfoSectionType {
+    HEALTH,
+    PRICE,
+}
+
 @Composable
-private fun HealthScoreRow(
+private fun CarInfoRow(
     modifier: Modifier = Modifier,
-    onInfoIconClicked: () -> Unit = {},
+    onInfoIconClicked: (CarInfoSectionType) -> Unit = {},
     healthScore: Int,
+    estimatedCarPrice: String,
 ) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 12.dp)
-            .clickable { onInfoIconClicked() },
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "$healthScore% ",
-            style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.ExtraBold)
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        CarInfoSection(
+            sectionTitle = "Vehicle condition",
+            carInfoSectionType = CarInfoSectionType.HEALTH,
+            modifier = modifier,
+            onInfoIconClicked = onInfoIconClicked,
+            displayValue = healthScore
         )
-        Text(
-            text = "Health Score",
-            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
-        )
-        Icon(imageVector = Icons.Filled.Info, contentDescription = "")
+        if (estimatedCarPrice.isNotBlank()) {
+            CarInfoSection(
+                sectionTitle = "Price estimate",
+                carInfoSectionType = CarInfoSectionType.PRICE,
+                modifier = modifier,
+                onInfoIconClicked = onInfoIconClicked,
+                displayValue = estimatedCarPrice
+            )
+        }
     }
 }
+
+
+@Composable
+fun <T> CarInfoSection(
+    sectionTitle: String,
+    carInfoSectionType: CarInfoSectionType,
+    modifier: Modifier,
+    onInfoIconClicked: (CarInfoSectionType) -> Unit,
+    displayValue: T
+) {
+    Column(
+        modifier = modifier
+            .padding(vertical = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = sectionTitle,
+                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+            IconButton(
+                onClick = { onInfoIconClicked(carInfoSectionType) }, modifier = Modifier.padding(
+                    PaddingValues(0.dp)
+                )
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Info,
+                    contentDescription = "",
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier
+                        .size(18.dp),
+                )
+            }
+        }
+        when (carInfoSectionType) {
+            CarInfoSectionType.HEALTH -> Text(
+                text = "${displayValue as Int}% ",
+                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.ExtraBold),
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+
+            CarInfoSectionType.PRICE -> {
+                Text(
+                    text = "$displayValue",
+                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.ExtraBold),
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.primaryContainer)
+                        .padding(4.dp)
+                )
+            }
+        }
+    }
+}
+
 
 @Preview
 @Composable
@@ -323,13 +456,9 @@ fun PreviewLoadedHomeUi() {
     Scaffold {
         CompositionLocalProvider {
             LoadedHomeUi(
-                homeModel = HomeModel(40, 12000, 2, 1, 1, "Toyota Corolla"),
+                homeModel = HomeModel(40, 12000, 2, 1, 1, "Toyota Corolla", "$12000.00"),
                 modifier = Modifier.padding(it),
                 uploadState = UploadState.Idle,
-                authState = AuthState.UserAuthenticated(
-                    shouldSkipNameStep = false,
-                    authAuthenticatedModel = AuthAuthenticatedModel(context = LocalContext.current)
-                )
             )
         }
     }

@@ -30,6 +30,7 @@ sealed class HomeServiceState {
         val health: Int,
         val carModelMake: String = "Unknown",
         val recalls: Int? = null,
+        val estimatedCarPrice: String,
     ) : HomeServiceState()
 }
 
@@ -83,6 +84,7 @@ class HomeServiceImpl @Inject constructor(
         health = healthScore,
         repairs = repairs,
         uploads = reports,
-        recalls = recalls
+        recalls = recalls,
+        estimatedCarPrice = estimatedCarPrice ?: ""
     )
 }

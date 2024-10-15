@@ -150,7 +150,6 @@ fun HomeScreen(
                     navigateToAlerts = navigateToAlerts,
                     navigateToRecalls = navigateToRecalls,
                     uploadState = uploadState,
-                    authState = authState
                 )
             }
         }

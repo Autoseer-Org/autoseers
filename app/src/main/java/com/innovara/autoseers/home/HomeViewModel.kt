@@ -42,6 +42,7 @@ data class HomeModel(
     val uploadedReports: Int,
     val carModelMake: String,
     val recalls: Int? = null,
+    val estimatedCarPrice: String,
 )
 
 @HiltViewModel
@@ -116,6 +117,7 @@ class HomeViewModel @Inject constructor(
         totalMileage = mileage,
         uploadedReports = uploads,
         carModelMake = carModelMake,
-        recalls = recalls
+        recalls = recalls,
+        estimatedCarPrice = estimatedCarPrice
     )
 }
