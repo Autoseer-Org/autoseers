@@ -94,6 +94,13 @@ fun RecallsPage(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                     }
+                    item {
+                        Text(
+                            text = "Based on the data we pulled, we've identified ${listState.size} open recalls for your car's make, model and year.",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
+                    }
                     items(listState, key = { recall ->
                         recall.nhtsaCampaignNumber
                     }) { recall ->
@@ -159,9 +166,10 @@ fun RecallCard(
                 Text(
                     text = recallModel.component,
                     overflow = TextOverflow.Ellipsis,
-                    maxLines = 1,
+                    maxLines = 2,
                     softWrap = true,
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
             Column(modifier = Modifier, horizontalAlignment = Alignment.End) {

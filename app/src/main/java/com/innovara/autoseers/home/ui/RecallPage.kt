@@ -87,41 +87,53 @@ fun RecallPage(
                 .verticalScroll(scrollState),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-//            Icon(
-//                painter = painterResource(id = R.drawable.purple_scribble),
-//                contentDescription = "",
-//                modifier = Modifier.size(84.dp)
-//            )
-//            Text(
-//                text = recallArgument.alertName,
-//                style = MaterialTheme.typography.displayMedium,
-//                maxLines = 3,
-//                overflow = TextOverflow.Ellipsis
-//            )
+            Icon(
+                painter = painterResource(id = R.drawable.purple_scribble),
+                contentDescription = "",
+                modifier = Modifier.size(84.dp)
+            )
+            Text(
+                text = recallArgument.component,
+                style = MaterialTheme.typography.displayMedium,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis
+            )
 //            Row {
-//                Text(text = recallArgument.alertState, style = MaterialTheme.typography.bodyMedium)
+//                Text(text = recallArgument.status, style = MaterialTheme.typography.bodyMedium)
 //                Spacer(modifier = Modifier.width(8.dp))
 //                Text(text = "•", style = MaterialTheme.typography.bodyMedium)
 //                Spacer(modifier = Modifier.width(8.dp))
-//                Text(text = alertArgument.alertCategory, style = MaterialTheme.typography.bodyMedium)
+//                Text(text = recallArgument., style = MaterialTheme.typography.bodyMedium)
 //            }
-//            Text(
-//                text = alertArgument.alertDescription,
-//                style = MaterialTheme.typography.bodySmall,
-//            )
-//            Spacer(modifier = Modifier.height(16.dp))
-//            TextButton(onClick = {
-//                scope.launch {
-//                    markAsComplete(
-//                        authToken,
-//                        MarkAsCompleteModel(
-//                            nhtsaCampaignNumber = recallArgument.nhtsaCampaignNumber
-//                        )
-//                    )
-//                }
-//            }) {
-//                Text(text = "Mark as complete")
-//            }
+            Text(
+                text = recallArgument.summary,
+                style = MaterialTheme.typography.bodySmall,
+            )
+            Text(
+                text = recallArgument.summary,
+                style = MaterialTheme.typography.bodySmall,
+            )
+            Text(
+                text = recallArgument.consequence,
+                style = MaterialTheme.typography.bodySmall,
+            )
+            Text(
+                text = recallArgument.remedy,
+                style = MaterialTheme.typography.bodySmall,
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            TextButton(onClick = {
+                scope.launch {
+                    markAsComplete(
+                        authToken,
+                        MarkAsCompleteModel(
+                            nhtsaCampaignNumber = recallArgument.nhtsaCampaignNumber
+                        )
+                    )
+                }
+            }) {
+                Text(text = "Mark as complete")
+            }
         }
     }
 }
