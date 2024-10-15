@@ -242,12 +242,11 @@ fun LoadedHomeUi(
                     style = MaterialTheme.typography.bodyLarge
                 )
                 HomeCard(
-                    modifier = Modifier.clickable {
-                        navigateToRecalls()
-                    },
                     title = "You have ${homeModel.recalls} recalls for your car",
                     description = "Based on the data we pulled, we've identified ${homeModel.recalls} open recalls for your car's make, model and year."
-                )
+                ) {
+                    navigateToRecalls()
+                }
             }
         }
     }
@@ -456,7 +455,7 @@ fun PreviewLoadedHomeUi() {
     Scaffold {
         CompositionLocalProvider {
             LoadedHomeUi(
-                homeModel = HomeModel(40, 12000, 2, 1, 1, "Toyota Corolla", "$12000.00"),
+                homeModel = HomeModel(40, 12000, 2, 1, 1, "Toyota Corolla", 2, "$12000.00"),
                 modifier = Modifier.padding(it),
                 uploadState = UploadState.Idle,
             )

@@ -18,12 +18,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -60,13 +62,27 @@ fun RecallPage(
         SnackbarHostState()
     }
     val scope = rememberCoroutineScope()
+    LaunchedEffect(key1 = markAsCompleteState) {
+        scope.launch {
+            if (markAsCompleteState is MarkAsCompleteState.Complete) {
+                snackBarState.showSnackbar(
+                    message = "Congratulations! You've repaired one part",
+                    duration = SnackbarDuration.Short
+                )
+            }
+        }.invokeOnCompletion {
+            if (markAsCompleteState is MarkAsCompleteState.Complete) {
+                navigateBack()
+            }
+        }
+    }
     Scaffold(
         snackbarHost = {
             SnackbarHost(hostState = snackBarState)
         },
         topBar = {
             TopAppBar(
-                title = { Text(text = "Part") },
+                title = { Text(text = "Recall") },
                 navigationIcon = {
                     IconButton(onClick = { navigateBack() }) {
                         Icon(
@@ -88,7 +104,7 @@ fun RecallPage(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.purple_scribble),
+                painter = painterResource(id = R.drawable.purple_blob),
                 contentDescription = "",
                 modifier = Modifier.size(84.dp)
             )
@@ -98,13 +114,6 @@ fun RecallPage(
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis
             )
-//            Row {
-//                Text(text = recallArgument.status, style = MaterialTheme.typography.bodyMedium)
-//                Spacer(modifier = Modifier.width(8.dp))
-//                Text(text = "•", style = MaterialTheme.typography.bodyMedium)
-//                Spacer(modifier = Modifier.width(8.dp))
-//                Text(text = recallArgument., style = MaterialTheme.typography.bodyMedium)
-//            }
             Text(
                 text = recallArgument.summary,
                 style = MaterialTheme.typography.bodySmall,
