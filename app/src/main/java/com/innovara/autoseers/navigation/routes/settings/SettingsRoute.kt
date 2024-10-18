@@ -4,7 +4,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -31,13 +30,15 @@ fun NavGraphBuilder.buildSettingsScreen(
     onLogoutPress: () -> Unit = {},
     navigateToThemePage: () -> Unit = {},
     navigateToNotifications: () -> Unit = {},
+    deleteAccount: () -> Unit = {},
 ) {
     composable<SettingsRoute> {
         if (authState is AuthState.UserAuthenticated) {
             SettingsPage(
                 onLogoutPress = onLogoutPress,
                 navigateToThemePage = navigateToThemePage,
-                navigateToNotifications = navigateToNotifications
+                navigateToNotifications = navigateToNotifications,
+                deleteAccount = deleteAccount
             )
         }
     }

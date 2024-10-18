@@ -54,6 +54,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -141,22 +143,18 @@ fun LoadedHomeUi(
         EmptyHomeUi(modifier, uploadState)
     } else {
         val screenWidth = LocalConfiguration.current.screenWidthDp
-        val screenHeight = LocalConfiguration.current.screenHeightDp
+        var heightOffsetForBackground by remember {
+            mutableStateOf(Offset.Zero)
+        }
         Column(
             modifier = modifier
                 .drawBehind {
-                    val yOffset = scrollableState.value * 1.2
-                    this.center.copy(0f, 0f)
                     drawRect(
-                        topLeft = Offset(0f, -yOffset.toFloat()),
                         size = Size(
-                            height = screenHeight.dp.toPx() * .5f,
+                            height = heightOffsetForBackground.y + 100f,
                             width = screenWidth.dp.toPx()
                         ),
-                        brush = Brush.radialGradient(
-                            listOf(Color.Transparent, Color.Black),
-                            radius = .1.dp.toPx(),
-                        ),
+                        color = Color.Black,
                         style = Fill
                     )
                 }
@@ -198,7 +196,10 @@ fun LoadedHomeUi(
                     }
                 })
             DashboardSection(
-                mileage = homeModel.totalMileage.toString(),
+                onPositionChanged = {
+                    heightOffsetForBackground = it
+                },
+                mileage = homeModel.totalMileage,
                 alerts = homeModel.alerts,
                 repairs = homeModel.repairs,
                 uploads = homeModel.uploadedReports
@@ -282,6 +283,7 @@ fun HomeCard(
 
 @Composable
 fun DashboardSection(
+    onPositionChanged: (Offset) -> Unit,
     modifier: Modifier = Modifier,
     mileage: String,
     alerts: Int,
@@ -290,6 +292,10 @@ fun DashboardSection(
 ) {
     Row(
         modifier = modifier
+            .onGloballyPositioned {
+                val coordinates = it.positionInWindow()
+                onPositionChanged(coordinates)
+            }
             .clip(shape = RoundedCornerShape(12.dp))
             .background(MaterialTheme.colorScheme.secondaryContainer)
             .fillMaxWidth()
@@ -440,7 +446,7 @@ fun PreviewLoadedHomeUi() {
     Scaffold {
         CompositionLocalProvider {
             LoadedHomeUi(
-                homeModel = HomeModel(40, 12000, 2, 1, 1, "Toyota Corolla", "$12000.00"),
+                homeModel = HomeModel(40, "12000", 2, 1, 1, "Toyota Corolla", "$12000.00"),
                 modifier = Modifier.padding(it),
                 uploadState = UploadState.Idle,
             )

@@ -4,6 +4,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
@@ -12,6 +13,7 @@ import com.innovara.autoseers.home.AlertsViewModel
 import com.innovara.autoseers.home.ui.AlertPage
 import com.innovara.autoseers.home.ui.AlertsPage
 import com.innovara.autoseers.home.ui.HomeScreen
+import com.innovara.autoseers.navigation.routes.AutoSeersExperience
 import com.innovara.autoseers.navigation.routes.GlobalRoute
 import kotlinx.serialization.Serializable
 
@@ -81,4 +83,19 @@ fun NavGraphBuilder.buildAlertPage(
             shouldShowBookingsButton = shouldShowBookingsButton,
         )
     }
+}
+
+fun NavController.navigateToAutoSeersExperience() = navigate(route = AutoSeersExperience) {
+    try {
+        popUpTo(0) {
+            inclusive = true
+        }
+        launchSingleTop = true
+    }catch (e: Exception) {
+        println(e.localizedMessage)
+    }
+}
+
+fun NavController.navigateToAlerts() = navigate(route = AlertsRoute) {
+    restoreState = true
 }

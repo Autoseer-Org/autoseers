@@ -69,6 +69,6 @@ class RecommendationsServiceImpl @Inject constructor(
         make = make,
         model = model,
         year = year.toString(),
-        mileage = "16,000"
+        mileage = mileage
     )
 }

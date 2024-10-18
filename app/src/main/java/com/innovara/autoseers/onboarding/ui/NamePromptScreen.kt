@@ -42,12 +42,15 @@ fun NamePromptScreen(
                 text = stringResource(id = R.string.name_title_screen),
                 style = MaterialTheme.typography.headlineLarge
             )
-            Text(text = stringResource(id = R.string.name_description_screen))
+            Text(
+                text = stringResource(id = R.string.name_description_screen),
+                style = MaterialTheme.typography.bodySmall
+            )
             TextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = username, onValueChange = { newName ->
-                username = newName
-            },
+                    username = newName
+                },
                 singleLine = true,
                 keyboardActions = KeyboardActions(onDone = {
                     focusManager.clearFocus(true)

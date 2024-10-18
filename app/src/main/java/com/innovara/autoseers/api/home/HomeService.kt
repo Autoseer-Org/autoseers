@@ -23,7 +23,7 @@ sealed class HomeServiceState {
     data object Empty : HomeServiceState()
     data object Loading : HomeServiceState()
     data class Loaded(
-        val mileage: Int,
+        val mileage: String,
         val alerts: Int,
         val repairs: Int,
         val uploads: Int,
@@ -72,7 +72,7 @@ class HomeServiceImpl @Inject constructor(
     }
 
     private fun HomeData.toHomeServiceLoadedState() = HomeServiceState.Loaded(
-        mileage = mileage ?: 0,
+        mileage = mileage ?: "",
         alerts = alerts,
         carModelMake = "${make?.lowercase(Locale.ROOT)?.capitalize(Locale.ROOT)} ${model?.capitalize(Locale.ROOT)}",
         health = healthScore,

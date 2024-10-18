@@ -16,7 +16,7 @@
     <string name="next_button">Next</string>
 
     <string name="name_title_screen">Let’s get to know each other</string>
-    <string name="name_description_screen">Tell us what your name is so we can always greet you when you open the app</string>
+    <string name="name_description_screen">Tell us your name so we can keep things personalized every time you jump back into the app!</string>
     <string name="name_button_title">Finish setup</string>
 
     <string name="sign_up_flow_title">Sign up</string>
