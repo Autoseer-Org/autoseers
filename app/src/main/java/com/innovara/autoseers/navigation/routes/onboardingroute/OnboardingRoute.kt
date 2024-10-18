@@ -6,7 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.innovara.autoseers.AuthState
 import com.innovara.autoseers.navigation.routes.AutoSeersExperience
-import com.innovara.autoseers.navigation.routes.homeroute.HomeRoute
+import com.innovara.autoseers.navigation.routes.GlobalRoute
 import com.innovara.autoseers.onboarding.logic.OnboardingEvents
 import com.innovara.autoseers.onboarding.ui.CodeAuthenticationScreen
 import com.innovara.autoseers.onboarding.ui.InitialScreen
@@ -15,7 +15,9 @@ import com.innovara.autoseers.onboarding.ui.PhoneAuthenticationScreen
 import kotlinx.serialization.Serializable
 
 @Serializable
-object OnboardingRoute
+data object OnboardingRoute: GlobalRoute() {
+    override fun toString(): String = "OnboardingRoute"
+}
 
 @Serializable
 data class PhoneAuthenticationRoute(
@@ -89,13 +91,15 @@ fun NavGraphBuilder.buildNamePromptScreen(
 
 // Nav Events
 fun NavController.navigateToPhoneAuthentication(isSignUpFlow: Boolean) = navigate(route = PhoneAuthenticationRoute(isSignUpFlow))
-fun NavController.navigateToAutoSeersExperience() = navigate(route = AutoSeersExperience) {
-    try {
-        popBackStack(route = HomeRoute, inclusive = false) // Assumes HomeRoute is the root of the nested graph
-    }catch (e: Exception) {
-        println(e.localizedMessage)
-    }
-}
 
 fun NavController.navigateToCodeScreen() = navigate(route = CodeRoute)
 fun NavController.navigateToNamePrompt() = navigate(route = NamePromptRoute)
+fun NavController.navigateToOnboardingScreen() {
+    navigate(OnboardingRoute) {
+        popUpTo(AutoSeersExperience){
+            inclusive = true
+            saveState = true
+        }
+        launchSingleTop = true
+    }
+}

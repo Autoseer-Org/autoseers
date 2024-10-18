@@ -30,9 +30,9 @@ object RetrofitModule {
         logger.setLevel(HttpLoggingInterceptor.Level.BODY)
         val client = OkHttpClient.Builder()
             .addInterceptor(logger)
-            .callTimeout(Duration.ofMillis(35_000))
-            .connectTimeout(Duration.ofMillis(35_000))
-            .readTimeout(Duration.ofMillis(35_000))
+            .callTimeout(Duration.ofMillis(60_000))
+            .connectTimeout(Duration.ofMillis(60_000))
+            .readTimeout(Duration.ofMillis(60_000))
             .connectionSpecs(
                 listOf(
                     ConnectionSpec.MODERN_TLS,

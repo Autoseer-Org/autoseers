@@ -36,7 +36,7 @@ sealed class HomeState {
 
 data class HomeModel(
     val healthScore: Int,
-    val totalMileage: Int,
+    val totalMileage: String,
     val alerts: Int,
     val repairs: Int,
     val uploadedReports: Int,

@@ -20,7 +20,7 @@ data class HomeResponse(
 @Serializable
 data class HomeData(
     @SerialName("mileage")
-    val mileage: Int? = 0,
+    val mileage: String? = "",
     @SerialName("health_score")
     val healthScore: Int,
     @SerialName("alerts")

@@ -90,9 +90,10 @@ fun RecommendedServicesScreen(
                 LazyColumn(
                     modifier = Modifier
                         .padding(it)
-                        .padding(12.dp)
+                        .padding(horizontal = 12.dp),
                 ) {
                     item {
+                        Spacer(modifier = Modifier.height(18.dp))
                         Text(
                             text = "These are the services that are most likely due based on your current mileage.",
                             style = MaterialTheme.typography.bodySmall
@@ -380,7 +381,7 @@ fun ServiceCard(
     Column(
         modifier = Modifier
             .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.primary)
+            .background(MaterialTheme.colorScheme.surface)
             .padding(18.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -390,11 +391,11 @@ fun ServiceCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
-                Text(text = serviceName, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimary)
+                Text(text = serviceName, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
                 Text(
                     text = "$servicePrice Average price",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onPrimary
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
             Image(

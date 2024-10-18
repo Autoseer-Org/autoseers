@@ -6,12 +6,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -23,7 +24,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.innovara.autoseers.AuthState
 import com.innovara.autoseers.navigation.routes.AutoSeersExperience
-import com.innovara.autoseers.navigation.routes.homeroute.AlertsRoute
 import com.innovara.autoseers.navigation.routes.homeroute.HomeRoute
 import com.innovara.autoseers.navigation.routes.homeroute.buildAlertPage
 import com.innovara.autoseers.navigation.routes.homeroute.buildAlertsPage
@@ -35,7 +35,6 @@ import com.innovara.autoseers.navigation.routes.onboardingroute.buildNamePromptS
 import com.innovara.autoseers.navigation.routes.onboardingroute.buildOnboardingScreen
 import com.innovara.autoseers.navigation.routes.onboardingroute.buildPhoneAuthenticationScreen
 import com.innovara.autoseers.navigation.routes.onboardingroute.navigateToCodeScreen
-import com.innovara.autoseers.navigation.routes.onboardingroute.navigateToAutoSeersExperience
 import com.innovara.autoseers.navigation.routes.onboardingroute.navigateToNamePrompt
 import com.innovara.autoseers.navigation.routes.onboardingroute.navigateToPhoneAuthentication
 import com.innovara.autoseers.navigation.routes.settings.SettingsRoute
@@ -45,11 +44,12 @@ import com.innovara.autoseers.onboarding.logic.OnboardingViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import com.innovara.autoseers.R
+import com.innovara.autoseers.navigation.routes.homeroute.navigateToAlerts
+import com.innovara.autoseers.navigation.routes.homeroute.navigateToAutoSeersExperience
+import com.innovara.autoseers.navigation.routes.onboardingroute.navigateToOnboardingScreen
 import com.innovara.autoseers.navigation.routes.recommendations.buildRecommendedServices
 import com.innovara.autoseers.navigation.routes.settings.buildThemePage
 import com.innovara.autoseers.navigation.routes.settings.navigateToThemePage
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.map
 
 /**
  * NavigationAppManager serves as the entry point for creating the nav graph for the app
@@ -72,11 +72,11 @@ fun NavigationAppManager(
     val onboardingState by onboardingViewModel.state.collectAsState()
     val analyticsEvents = onboardingViewModel.handleAnalyticsEvents()
 
-    var shouldShowBottomNavBar by remember {
+    var shouldShowBottomNavBar by rememberSaveable {
         mutableStateOf(false)
     }
 
-    val shouldNavigateToCodeScreen = remember(authState) {
+    val shouldNavigateToCodeScreen = rememberSaveable(authState) {
         when (authState) {
             is AuthState.PhoneVerificationInProgress ->
                 authState.authInProgressModel.shouldTransitionToCodeScreen
@@ -85,31 +85,20 @@ fun NavigationAppManager(
         }
     }
 
-    val shouldNavigateToNamePrompt = remember(authState, shouldShowBottomNavBar) {
+    val shouldNavigateToNamePrompt = rememberSaveable(authState) {
         when (authState) {
-            is AuthState.UserAuthenticated -> {
-                if (authState.shouldSkipNameStep) {
-                    navController.navigateToAutoSeersExperience()
-                    shouldShowBottomNavBar = true
-                    false
-                } else {
-                    !shouldShowBottomNavBar
-                }
-            }
-
+            is AuthState.UserAuthenticated -> !authState.shouldSkipNameStep
             else -> false
         }
     }
-    val currentBackStackEntryAsFlow = navController.currentBackStackEntryFlow
-    var isMainRoute by remember {
-        mutableStateOf(false)
-    }
-    LaunchedEffect(key1 = currentBackStackEntryAsFlow) {
-        currentBackStackEntryAsFlow.collectLatest { backStackEntry ->
-            Log.e("CURRENT ROUTE", backStackEntry.destination.route ?: "")
-            isMainRoute = backStackEntry.isAllowedToSeeBottomNavBar()
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val isMainRoute by remember {
+        derivedStateOf {
+            navBackStackEntry?.isAllowedToSeeBottomNavBar() == true
         }
     }
+
     Scaffold(
         bottomBar = {
             if (shouldShowBottomNavBar && isMainRoute) {
@@ -146,10 +135,17 @@ fun NavigationAppManager(
         if (shouldNavigateToNamePrompt) {
             navController.navigateToNamePrompt()
         }
+
+        LaunchedEffect(authState, onboardingState) {
+            if ((authState is AuthState.UserAuthenticated && authState.shouldSkipNameStep) || onboardingState is OnboardingState.NewUserCreated) {
+                navController.navigateToAutoSeersExperience()
+                shouldShowBottomNavBar = true
+            }
+        }
         NavHost(
             modifier = Modifier.padding(it),
             navController = navController,
-            startDestination = if (authState is AuthState.UserAuthenticated && authState.shouldSkipNameStep) AutoSeersExperience else OnboardingRoute
+            startDestination = OnboardingRoute,
         ) {
             buildOnboardingScreen(
                 authState = authState,
@@ -185,18 +181,13 @@ fun NavigationAppManager(
                                 username = name
                             )
                         }
-                    }.invokeOnCompletion {
-                        if (onboardingState is OnboardingState.NewUserCreated && authState is AuthState.UserAuthenticated) {
-                            shouldShowBottomNavBar = true
-                            navController.navigateToAutoSeersExperience()
-                        }
                     }
                 },
                 onNameEnteredEvents = analyticsEvents,
             )
             navigation<AutoSeersExperience>(startDestination = HomeRoute) {
                 buildHomeScreen(authState) {
-                    navController.navigate(AlertsRoute)
+                    navController.navigateToAlerts()
                 }
                 buildAlertsPage(
                     authState,
@@ -207,17 +198,52 @@ fun NavigationAppManager(
                     navController.popBackStack()
                 }
                 buildRecommendedServices(authState)
-                buildSettingsScreen(authState, navigateToThemePage = {
-                    navController.navigateToThemePage()
-                }, onLogoutPress = {
-                    onLogoutPressed()
-                    resetAuthState()
-                    shouldShowBottomNavBar = false
-                })
+                buildSettingsScreen(authState,
+                    deleteAccount = {
+                        if (authState is AuthState.UserAuthenticated) {
+                            scope.launch {
+                                onboardingViewModel
+                                    .deleteAccount(
+                                        tokenId = authState.authAuthenticatedModel.getToken()
+                                    )
+                            }.invokeOnCompletion {
+                                prepareUiForLoggedOutState(
+                                    onLogoutPressed,
+                                    resetAuthState
+                                ) { bottomNavBarValue ->
+                                    shouldShowBottomNavBar = bottomNavBarValue
+                                }.also {
+                                    navController.navigateToOnboardingScreen()
+                                }
+                            }
+                        }
+                    },
+                    navigateToThemePage = {
+                        navController.navigateToThemePage()
+                    }, onLogoutPress = {
+                        prepareUiForLoggedOutState(
+                            onLogoutPressed,
+                            resetAuthState
+                        ) { bottomNavBarValue ->
+                            shouldShowBottomNavBar = bottomNavBarValue
+                        }.also {
+                            navController.navigateToOnboardingScreen()
+                        }
+                    })
                 buildThemePage(onBackPress = {
                     navController.popBackStack()
                 })
             }
         }
     }
+}
+
+private fun prepareUiForLoggedOutState(
+    onLogoutPressed: () -> Unit,
+    resetAuthState: () -> Unit,
+    onBottomNavBarChanged: (Boolean) -> Unit
+) {
+    onLogoutPressed()
+    resetAuthState()
+    onBottomNavBarChanged(false)
 }

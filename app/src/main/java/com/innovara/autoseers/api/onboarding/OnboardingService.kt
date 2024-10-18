@@ -1,8 +1,7 @@
 package com.innovara.autoseers.api.onboarding
 
-import android.content.Context
-import dagger.hilt.android.qualifiers.ActivityContext
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import retrofit2.Retrofit
 import retrofit2.await
@@ -17,6 +16,7 @@ sealed class OnboardingServiceState {
 
 interface OnboardingService {
     suspend fun sendOnboardingData(token: String, onboardingRequest: OnboardingRequest): Flow<OnboardingServiceState>
+    suspend fun deleteAccount(token: String) : Flow<Boolean>
 }
 
 class OnboardingServiceImpl @Inject constructor(
@@ -36,4 +36,14 @@ class OnboardingServiceImpl @Inject constructor(
                 )
             }
         }
+
+    override suspend fun deleteAccount(token: String): Flow<Boolean> = flow {
+        val response = api.deleteAccount(authHeader = token).await()
+        when {
+            response.success -> emit(true)
+            else -> emit(false)
+        }
+    }.catch {
+        emit(false)
+    }
 }

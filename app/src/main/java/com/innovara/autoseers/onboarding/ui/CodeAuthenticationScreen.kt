@@ -103,7 +103,10 @@ fun CodeAuthenticationScreen(
                     }
                 }
             )
-            Text(text = stringResource(id = R.string.code_sent_message))
+            Text(
+                text = stringResource(id = R.string.code_sent_message),
+                style = MaterialTheme.typography.bodySmall
+            )
 
             TextField(
                 modifier = Modifier

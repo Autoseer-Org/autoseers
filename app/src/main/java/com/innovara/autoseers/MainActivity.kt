@@ -1,6 +1,5 @@
 package com.innovara.autoseers
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -9,18 +8,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.navigation.compose.rememberNavController
 import com.example.compose.AutoSeersTheme
 import com.innovara.autoseers.di.firebase.FirebaseService
@@ -28,7 +22,6 @@ import com.innovara.autoseers.navigation.NavigationAppManager
 import com.innovara.autoseers.settings.ui.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -61,7 +54,8 @@ class MainActivity : ComponentActivity() {
 
             else -> {
                 // User is signed in. Take them to the home page
-                auth.currentUser?.getIdToken(false)
+                // Set true for forcing to refresh
+                auth.currentUser?.getIdToken(true)
                     ?.addOnFailureListener {
                         isReady = true
                         authViewModel.resetAuthState(
